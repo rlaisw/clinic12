@@ -4,6 +4,8 @@
 
 Add a new receipt tab on the patient dashboard that allows doctors to generate fillable PDF receipts for patient visits using the receipt-f1.pdf template. The feature includes QR code verification and follows the same pattern as the sick leave certificate feature.
 
+**Enhancements**: Comprehensive error handling strategy including frontend error states, backend error codes, and expanded validation scenarios for both success and failure cases. Test coverage includes unit tests, integration tests, and error case testing.
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x (frontend), Python 3.11+ (backend/Django)
@@ -219,16 +221,55 @@ useVerifyReceipt() -> {
 | 6 | QR verification | 1. Scan QR code with phone/scanner<br>2. Or visit verification URL | Verification page shows receipt details and "Valid receipt" |
 | 7 | Role restriction | 1. Log in as non-doctor<br>2. Navigate to same URL<br>3. Try to access Receipt tab | Tab not visible or 403/redirect |
 
+## Error Handling Strategy
+
+### Frontend Error States
+- **Template Load Failure**: Show error message "Receipt template not available" with retry button
+- **PDF Generation Error**: Display "Failed to generate receipt. Please contact support." with error code
+- **QR Code Generation Failure**: Show placeholder QR with error message "QR verification temporarily unavailable"
+- **Network Errors**: Automatic retries (max 3 attempts) with exponential backoff
+- **Permission Errors**: Redirect to access denied page with clear messaging
+
+### Backend Error Codes
+```python
+# HTTP Status Codes:
+# 400 - Bad Request (invalid form data, missing fields)
+# 401 - Unauthorized (JWT token expired/invalid)
+# 403 - Forbidden (non-doctor role accessing receipt)
+# 404 - Not Found (patient does not exist)
+# 422 - Unprocessable Entity (PDF generation failed)
+# 500 - Internal Server Error (PDF library error, template missing)
+```
+
+### Validation Scenarios (Expanded)
+
+| # | Scenario | Steps | Expected Outcome |
+|---|----------|-------|------------------|
+| 8 | Missing patient name | Leave name field empty, click Generate | Validation error: "Patient name is required" |
+| 9 | Invalid amount (negative) | Enter negative total amount | Validation error: "Amount must be positive" |
+| 10 | Template missing | Rename template file, try generate | Error page: "Template configuration error" with admin notification |
+| 11 | PDF generation timeout | Simulate slow processing (>5s) | Timeout error message: "Generation taking longer than expected, please try again" |
+| 12 | Corrupted PDF template | Replace template with invalid file | Error: "Invalid template format" with safe failure fallback |
+| 13 | Duplicate receipt number | Force same rref, attempt creation | Conflict error: "Receipt already exists for this transaction" |
+| 14 | Revoked receipt verification | Revoke receipt, scan QR | Verification page: "This receipt has been revoked" with revocation reason |
+| 15 | Expired receipt verification | Modify timestamp to 11 years old, verify | Verification page: "This receipt has expired" with issue date |
+| 16 | Network failure during save | Disconnect network mid-generation | Local state preserved, retry option displayed |
+| 17 | Invalid JWT token | Modify token in Authorization header | 401 Unauthorized redirect to login |
+| 18 | Concurrent receipt creation | Two doctors same patient at same time | First succeeds, second gets conflict message |
+
 **Test Commands**:
 ```bash
 # Frontend unit tests
 cd apps/web && npx jest --testPathPattern="receipt" --coverage
 
 # Frontend integration tests  
-cd apps/web && npx playwright test receipt
+cd apps/web && npx playwright test receipt --reporter=list
 
-# Backend tests (verify endpoints and model)
-cd backend && python -m pytest api/tests.py -v -k "receit"
+# Backend tests (verify endpoints and error handling)
+cd backend && python -m pytest api/tests.py -v -k "receipt" --tb=short
+
+# Error handling verification
+cd backend && python -m pytest api/tests.py::test_receipt_errors -v
 ```
 
 **Expected Outcomes**:
