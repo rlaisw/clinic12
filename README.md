@@ -1,55 +1,62 @@
-# Turborepo Tailwind CSS Starter
+# Clinic11 - Medication & Patient Management System
 
-This Turborepo starter is maintained by the Turborepo core team.
+## Overview
+Clinic11 is a full-stack medication and patient management system integrating a React/Next.js frontend with a Django backend. The system provides comprehensive medication inventory management, patient records, and now includes AI-powered assistance via Dify integration.
 
-## Project Overview
+## Key Features
 
-A full-stack project with React/Next.js frontend and Django backend integrated with Tailwind CSS.
+### 📊 Medication Management
+- Real-time inventory tracking with automatic stock alerts
+- Expiry date monitoring and reporting
+- Supplier management with contact integration
+- Historical inventory tracking and audit trails
 
-## Tech Stack
+### 🏥 Patient Records & Dashboard
+- Patient profiles with medical history, prescriptions, and sick leave certificates
+- **NEW**: Receipt generation system with fillable PDFs and QR code verification
+- **NEW**: AI Chatbot integration for doctor-assisted patient consultations
+- Multi-tab patient dashboard (Profile, Medications, Receipts, Sick Leave, AI Chatbot)
+- Theme system (Dark/Light/Light Blue/Light Green)
 
-### Frontend (React/Next.js)
-- **Core Framework**: React 19.2.0, Next.js 16.2.0
-- **UI Libraries**: Shadcn UI 0.0.0.0.4, Tailwind CSS 3.4.19, Shadcn 4.10.0
-- **State Management**: Tanstack Query 5.101.0
-- **Theme System**: 4 modes - Dark / Light / Light Blue / Light Green
-- **Utilities**: Axios 1.17.0 (HTTP), Lodash 4.*, Jest 27+, ESLint, Prettier
+### 🤖 AI-Powered Features
+- Dify-powered AI Chatbot for clinical decision support
+- Retrieval-Augmented Generation (RAG) for context-aware responses
+- Secure access via Tailscale tunneling
+- Role-based access controls (doctor-only)
 
-### Backend (Python/Django)
-- **Framework**: Django 6.0.6
-- **API**: DRF 3.17.1 + SimpleJWT 5.5.1
-- **ORM**: PostgreSQL (primary), SQLite (dev)
-- **Additional**: DRF-CORS 4.9.0, Django-Htmx 1.27.0, Django-Cotton 2.7.2
+### 📋 Document Management
+- Sick leave certificate generation with QR verification
+- Fillable PDF receipt generation with auto-calculation
+- Document status tracking (active/revoked/expired)
+- Secure QR code verification system
 
-### Shared Dependencies
-- Axios (HTTP client)
-- Jest (testing), ESLint (linting), Prettier (formatting)
+## Technical Highlights
 
 ### Infrastructure
-- PostgreSQL (primary DB), Redis/Memcached (caching)
-- Docker (containerization), Git (version control), Celery (background tasks), Sentry (logging)
+- **Backend**: Django 6.0.6 with PostgreSQL
+- **Frontend**: React 19.2.0, Next.js 16.2.0, Tailwind CSS 3.4.19
+- **AI Stack**: Dify workflow with RAG pipeline and Weaviate vector storage
+- **Connectivity**: Tailscale secure tunneling for internal/external communication
+- **Security**: SSRF proxy configuration with IP allowlisting
+- **Monitoring**: Health checks, logging, and error tracking
 
-## Theme System
+### Integration Points
+1. **SSRF Proxy**: Configured to allow internal access to RAG API and sandbox services
+2. **Tailscale Funnel**: Exposes local services securely via HTTPS
+3. **API Endpoints**: 
+   - RAG API: `https://kilo.tail10ee0.ts.net/api/rag/query`
+   - Authentication: Django REST Framework with JWT
+   - File Generation: Receipt and certificate PDF endpoints
+4. **Database**: Relational model with foreign key relationships between patients, medications, receipts, and certificates
 
-The application supports 4 theme modes with full persistence:
+## Getting Started
+See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for setup instructions.
 
-1. **Dark** - Default dark theme (selector label: Dark)
-2. **Light** - Clean light theme (selector label: White)
-3. **Light Blue** - Blue-tinted light theme (selector label: Blue)
-4. **Light Green** - Green-tinted light theme (selector label: Green)
+## Development
+1. Clone repository
+2. Install dependencies: `pnpm install` (frontend) and `pip install -r backend/requirements.txt` (backend)
+3. Configure environment: Copy `.env.example` to `.env` and adjust values
+4. Start services: `pnpm run dev` (starts both frontend and backend via Turborepo)
 
-### Theme Implementation
-- Theme context provider in `apps/web/contexts/theme-context.tsx`
-- Theme toggle component in `apps/web/components/theme-toggle.tsx`, rendered on the patient-queue landing page (`apps/web/app/(dashboard)/layout.tsx`)
-- Theme selector UI: Shadcn/ui **Native Select** (`apps/web/components/ui/native-select.tsx`) titled "Theme Mode" with four options — Dark, White, Blue, Green — mapping to `dark`, `light`, `light-blue`, `light-green`
-- Theme variables defined in `apps/web/app/globals.css`
-- Theme persistence via localStorage and URL parameters
-- Tailwind CSS custom color palette for light-blue and light-green
-
-### Usage
-```sh
-npx create-turbo@latest -e with-tailwind
-```
-
-## Dependencies
-- Full list in `backend/requirements.txt` and `apps/web/package.json`
+## License
+MIT

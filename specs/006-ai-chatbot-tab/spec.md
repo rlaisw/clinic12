@@ -22,7 +22,7 @@ Add a new "AI Chatbot" tab to the doctor's patient dashboard that opens a Dify c
 
 ### FR3: Chatbot Embedding
 - The AI Chatbot page must embed the Dify chatbot workflow in an iframe
-- The iframe source URL: `http://172.27.59.80/app/3c80b0a5-96d7-4012-bc6b-ef7a69536adc/workflow`
+- The iframe source URL: `https://dify.clinic.com.hk/chat/u3gp6aJ0gKWnEFDr`
 - The iframe must fill the available content area (full width, appropriate height)
 - The page should have a loading indicator while the iframe loads
 

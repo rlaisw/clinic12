@@ -363,3 +363,65 @@ class Receipt(models.Model):
 
     def __str__(self):
         return f"Receipt {self.id} - {self.patient_name}"
+
+
+class ReviewSession(models.Model):
+    """Tracks staff review of a RAG-generated answer."""
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    reviewer = models.ForeignKey(
+        "auth.User", on_delete=models.CASCADE, related_name="rag_reviews"
+    )
+    query = models.TextField()
+    answer = models.TextField()
+    context_used = models.JSONField(default=list)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    review_notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Review {self.id} - {self.status}"
+
+
+class ConversationSession(models.Model):
+    """Stateful conversation session for the RAG hybrid router."""
+
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("expired", "Expired"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session_id = models.CharField(max_length=64, unique=True)
+    doctor = models.ForeignKey(
+        "auth.User", on_delete=models.CASCADE, related_name="rag_sessions"
+    )
+    patient = models.ForeignKey(
+        "Patient", on_delete=models.CASCADE, related_name="conversation_sessions",
+        null=True, blank=True
+    )
+    context_data = models.JSONField(default=dict)
+    query_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Conversation {self.id} - {self.status}"
+
+    def is_expired(self):
+        return timezone.now() >= self.expires_at

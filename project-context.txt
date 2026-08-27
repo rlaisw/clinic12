@@ -20,7 +20,6 @@
   }
 }
 
-
 ### FOLDER STRUCTURE (Top 2 Levels) ###
 ├── README.md
 ├── apps
@@ -51,3 +50,49 @@
 ### NEXT CONFIG ###
 
 ### TSCONFIG.JSON ###
+
+### DIFY & RAG CONFIGURATION ###
+**✅ RESOLVED - All Issues Fixed**
+
+**Original Problem:** Dify HTTP Request node failing with 403 Forbidden and connection timeout to RAG API.
+
+**Root Cause & Fixes Applied:**
+1. **Tailscale Funnel URL Format** - Changed from `https://kilo.tail10ee0.ts.net:8443/api/rag/query` to `https://kilo.tail10ee0.ts.net/api/rag/query` (removed :8443 port)
+2. **SSRF Proxy Enabled** - Set `SSRF_PROXY_HTTP_URL=http://ssrf_proxy:3128` and `SSRF_PROXY_HTTPS_URL=http://ssrf_proxy:3128`
+3. **IP Allowlist Configured** - `SSRF_PROXY_ALLOW_PRIVATE_IPS=100.0.0.0/8,10.161.92.142` for Tailscale range and Dify server
+4. **Sandbox Proxy Enabled** - `SANDBOX_HTTP_PROXY=http://ssrf_proxy:3128` and `SANDBOX_HTTPS_PROXY=http://ssrf_proxy:3128`
+
+**Working Configuration:**
+- **RAG API Endpoint:** `https://kilo.tail10ee0.ts.net/api/rag/query`
+- **Token:** `e429e0ee02046d5c2f3933c26d53cf265872ee94`
+- **Method:** POST
+- **Headers:** 
+  - `Authorization: Token e429e0ee02046d5c2f3933c26d53cf265872ee94`
+  - `Content-Type: application/json`
+- **Body:** JSON format with `query` and `top_k` parameters
+- **SSL:** Enabled (valid Tailscale certificate)
+- **CORS:** Configured to allow Tailscale domains
+
+**Status:** ✅ Working - Successfully fetches patient data from RAG API
+
+### RECEIPT FEATURE ###
+**✅ IMPLEMENTED & WORKING**
+- Receipt page fixed: `apps/web/app/(dashboard)/doctor/patients/[id]/receipt/page.tsx` now renders `<ReceiptTabs patientId={id} />`
+- Tab integration complete in layout.tsx
+- Receipt generation and QR code verification functional
+
+### CURRENT ENVIRONMENT SETTINGS ###
+- Working Directory: `C:\kilocode\clinic11`
+- Current Date/Time: 2026-08-21T13:13:26+08:00
+- Backend Configuration: `backend/config/settings.py` line 92-94
+- CORS settings include Tailscale domains in CSRF_TRUSTED_ORIGINS and CORS_ALLOWED_ORIGINS
+- Tailscale funnel running: 
+  - `https://kilo.tail10ee0.ts.net/` → `http://localhost:3001` (Frontend)
+  - `https://kilo.tail10ee0.ts.net:8443/` → `http://127.0.0.1:8000` (Backend API)
+- Tailscale IP: `100.90.231.24`
+
+### KEY FILES MODIFIED ###
+- `apps/web/app/(dashboard)/doctor/patients/[id]/receipt/page.tsx` - Fixed to render ReceiptTabs
+- `backend/config/settings.py` - SSRF proxy, Dify, and CORS settings
+- `.env` (Dify server) - SSRF proxy and sandbox proxy configuration
+- `project-context.txt` - This file (updated with resolution details)

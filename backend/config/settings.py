@@ -89,6 +89,9 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 PUBLIC_VERIFY_BASE_URL = os.environ.get('PUBLIC_VERIFY_BASE_URL', 'http://localhost:8000')
 FRONTEND_BASE_URL = os.environ.get('FRONTEND_BASE_URL', 'http://localhost:3001')
+DIFY_BASE_URL = os.environ.get('DIFY_BASE_URL', 'https://dify.clinic.com.hk')
+DIFY_API_KEY = os.environ.get('DIFY_API_KEY', 'app-Iw2t4FSLM8xCc3y2vbcEWXKa')
+LANCEDB_URI = os.environ.get('LANCEDB_URI', 'lancedb')
 SICK_LEAVE_CERTIFICATE_TEMPLATE_PATH = os.path.join(BASE_DIR.parent, 'template', 'slcv1.pdf')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
