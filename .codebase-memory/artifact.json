@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "5f21e25f072c0b1e97aa8d0f8b01b92d097ea8c1",
-    "indexed_at": "2026-09-07T06:25:19Z",
+    "commit": "6014328d5c55607ccecf92e88716fe3b78714a48",
+    "indexed_at": "2026-09-07T06:28:40Z",
     "project": "home-administrator-kilocode-clinic12",
     "nodes": 3652,
-    "edges": 9013,
-    "original_size": 12058624,
-    "compressed_size": 2025158,
+    "edges": 9014,
+    "original_size": 11993088,
+    "compressed_size": 2013188,
     "compression_level": 3
 }
