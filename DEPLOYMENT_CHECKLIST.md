@@ -12,7 +12,8 @@
   - ALLOWED_HOSTS=[production_domain]
   - EMAIL_BACKEND (for alerts)
   - CORS_ALLOWED_ORIGINS
-  - DIFY_BASE_URL=https://dify.clinic.com.hk
+  - DIFY_BASE_URL=https://kilo.clinic.com.hk
+  - DIFY_API_KEY=app-Iw2t4FSLM8xCc3y2vbcEWXKa
   - DIFY_API_KEY (set in production)
   - LANCEDB_URI (vector database path)
   - SSRF_PROXY_HTTP_URL=http://ssrf_proxy:3128

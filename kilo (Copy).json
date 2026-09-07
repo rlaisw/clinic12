@@ -1,0 +1,9 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "permission": {
+    "bash": "allow",
+    "external_directory": {
+      "c:\\kilocode": "allow"
+    }
+  }
+}

@@ -63,15 +63,28 @@ function LoginForm() {
 export default function LoginPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const [validated, setValidated] = useState(false);
 
   useEffect(() => {
     const token = authApi.getToken();
     if (token && pathname === "/login") {
-      router.replace("/patient-queue");
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+      fetch(`${API_BASE}/auth/user/`, {
+        headers: { Authorization: `Token ${token}` },
+      }).then((res) => {
+        if (res.ok) {
+          router.replace("/patient-queue");
+        } else {
+          authApi.logout();
+          setValidated(true);
+        }
+      });
+    } else {
+      setValidated(true);
     }
   }, [router, pathname]);
 
-  if (typeof window !== "undefined" && authApi.getToken() && pathname === "/login") {
+  if (!validated) {
     return null;
   }
 

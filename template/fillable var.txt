@@ -2,7 +2,7 @@ SREF, consulation-date, patient-name, diagnosis, days, sick-leave-date, remark
 replace qrcode-sample by ...
 
 
-After doctor click New Certificate button, goto https://kilo.tail10ee0.ts.net/doctor/patients/[patient id]/sick-leave-certificate
+After doctor click New Certificate button, goto https://kilo.clinic.com.hk/doctor/patients/[patient id]/sick-leave-certificate
 - Automatically add SREF (unique sick leave reference number) and show on this tab page (create sick leave screen)
 - Add a new <Textarea>, <Label = Remarks> 
 

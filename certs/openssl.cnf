@@ -1,0 +1,19 @@
+[req]
+default_bits = 4096
+default_md = sha256
+prompt = no
+distinguished_name = dn
+x509_extensions = v3_req
+
+[dn]
+CN = kilo.clinic.com.hk
+O = Clinic Local Dev
+L = Hong Kong
+C = HK
+
+[v3_req]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = kilo.clinic.com.hk
+DNS.2 = clinic.com.hk

@@ -4,6 +4,7 @@ Uses sentence-transformers all-MiniLM-L6-v2 (384-dim).
 """
 
 import logging
+import os
 import numpy as np
 from typing import List, Optional
 
@@ -11,7 +12,13 @@ logger = logging.getLogger(__name__)
 
 try:
     from sentence_transformers import SentenceTransformer
-    _model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    
+    # Get HF_TOKEN from Django settings if available
+    hf_token = os.environ.get('HF_TOKEN', '')
+    if hf_token:
+        _model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", use_auth_token=hf_token)
+    else:
+        _model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 except ImportError:
     _model = None
     logger.warning("sentence-transformers not installed; embedding converter disabled.")

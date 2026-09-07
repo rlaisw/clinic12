@@ -3,7 +3,7 @@
 ## Prerequisites
 - Python 3.11+ with venv activated (`backend/venv/`)
 - Existing clinic SQLite at `backend/db.sqlite3`
-- Dify chatbot accessible at `https://dify.clinic.com.hk/chat/u3gp6aJ0gKWnEFDr`
+- Dify chatbot accessible at `https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY`
 
 ## Quick Validation
 

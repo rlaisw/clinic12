@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "in this tab page https://kilo.tail10ee0.ts.net/doctor/patients/[patient-id]/sick-leave-certificate i want to add a icon for preview "sick leave certificate" pdf file"
+**Input**: User description: "in this tab page https://kilo.clinic.com.hk/doctor/patients/[patient-id]/sick-leave-certificate i want to add a icon for preview "sick leave certificate" pdf file"
 
 ## User Scenarios & Testing *(mandatory)*
 

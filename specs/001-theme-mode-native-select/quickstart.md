@@ -23,7 +23,7 @@ pnpm dev          # or: pnpm --filter apps/web dev
 
 Open the patient-queue landing page:
 `http://localhost:3000/patient-queue`
-(or the deployed URL `https://kilo.tail10ee0.ts.net/patient-queue`).
+(or the deployed URL `https://kilo.clinic.com.hk/patient-queue`).
 
 ## Validation Scenarios
 

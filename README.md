@@ -44,8 +44,8 @@ Clinic11 is a full-stack medication and patient management system integrating a 
 1. **SSRF Proxy**: Configured to allow internal access to RAG API and sandbox services
 2. **Tailscale Funnel**: Exposes local services securely via HTTPS
 3. **API Endpoints**: 
-   - RAG API: `https://kilo.tail10ee0.ts.net/api/rag/query`
-   - Authentication: Django REST Framework with JWT
+   - SQL Schema API: `https://kilo.clinic.com.hk:8000/api/sql/schema`
+   - Auth: Django REST Framework with Token Authentication
    - File Generation: Receipt and certificate PDF endpoints
 4. **Database**: Relational model with foreign key relationships between patients, medications, receipts, and certificates
 

@@ -22,7 +22,7 @@ Invoke-RestMethod -Uri "http://172.28.51.11:8001/health"
 
 ## Step 2: Create Dify Custom Tool
 
-1. **Login** to Dify at `https://dify.clinic.com.hk`
+1. **Login** to Dify at `https://kilo.clinic.com.hk`
 2. Navigate to **Tools** → **Custom Tools** → **Create Custom Tool**
 3. Configure:
 
@@ -96,7 +96,7 @@ Invoke-RestMethod -Uri "http://172.28.51.11:8001/health"
 
 ## Step 4: Test
 
-Open `https://dify.clinic.com.hk/chat/u3gp6aJ0gKWnEFDr` and ask questions like:
+Open `https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY` and ask questions like:
 - "What patients have been prescribed medications?"
 - "Show me sick leave certificates with diagnosis of fever"
 - "What receipts were issued recently?"

@@ -4,12 +4,12 @@
 
 ### 🤖 AI Chatbot Integration
 - **Dify Integration**: Added AI-powered REINFORCEMENT LEARNING Assistant chatbot to clinic dashboard
-- **Tailscale Funnel**: Exposed Dify at `https://kilo.tail10ee0.ts.net` (HTTPS) and `https://kilo.tail10ee0.ts.net:8443` (HTTP) via Tailscale Funnel
+- **Chatbot URL**: `https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY`
 - **Structured HTTP Flow**: 
-  - Dify → `https://kilo.tail10ee0.ts.net` (HTTPS)
-  - `https://kilo.tail10ee0.ts.net:8443` (HTTP tunnel for legacy endpoints)
+  - Frontend: `https://kilo.clinic.com.hk:3001`
+  - Backend API: `https://kilo.clinic.com.hk:8000`
 - **Tab Integration**: Added "AI Chatbot" tab to patient dashboard using React Tab component and iframes
-- **Authentication**: Uses same OAuth token flow as other tabs
+- **Authentication**: Uses Django Token Authentication (`Authorization: Token 302b3a7bf0ddf403522ec09e642bb95494da5e52`)
 
 ### 🤝 Connectivity Improvements
 - Resolved SSRF proxy configuration
@@ -18,7 +18,7 @@
 - Implemented hybrid HTTP routing that automatically selects Tailscale port when needed
 
 ### 💬 AI Chatbot Workflow
-- Opens in iframe at `https://kilo.tail10ee0.ts.net/chat/u3gp6aJ0gKWnEFDr`
+- Opens in iframe at `https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY`
 - Interactive Dify chatbot for AI-powered assistance
 - Integrated into patient dashboard tab system
 - Maintains doctor-specific permissions

@@ -15,7 +15,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <UserProvider>
           {children}
         </UserProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
       </QueryClientProvider>
     </ThemeProvider>
   );

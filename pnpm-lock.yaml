@@ -12,9 +12,6 @@ importers:
         specifier: ^3.8.1
         version: 3.8.1(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react-is@16.13.1)(react@19.2.0)(redux@5.0.1)
     devDependencies:
-      eslint-plugin-turbo:
-        specifier: ^2.6.0
-        version: 2.6.0(eslint@9.39.1(jiti@2.6.1))(turbo@2.9.16)
       glob:
         specifier: ^11.1.0
         version: 11.1.0
@@ -35,7 +32,7 @@ importers:
         version: link:../../packages/ui
       geist:
         specifier: ^1.7.1
-        version: 1.7.1(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
+        version: 1.7.1(next@16.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
       next:
         specifier: 16.2.0
         version: 16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -126,7 +123,7 @@ importers:
         version: 2.1.1
       geist:
         specifier: ^1.7.1
-        version: 1.7.1(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
+        version: 1.7.1(next@16.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
       lucide-react:
         specifier: ^1.17.0
         version: 1.17.0(react@19.2.0)
@@ -5203,12 +5200,6 @@ snapshots:
       string.prototype.matchall: 4.0.12
       string.prototype.repeat: 1.0.0
 
-  eslint-plugin-turbo@2.6.0(eslint@9.39.1(jiti@2.6.1))(turbo@2.9.16):
-    dependencies:
-      dotenv: 16.0.3
-      eslint: 9.39.1(jiti@2.6.1)
-      turbo: 2.9.16
-
   eslint-plugin-turbo@2.6.0(eslint@9.39.1(jiti@2.6.1))(turbo@2.9.18):
     dependencies:
       dotenv: 16.0.3
@@ -5504,7 +5495,7 @@ snapshots:
 
   fuzzysort@3.1.0: {}
 
-  geist@1.7.1(next@16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)):
+  geist@1.7.1(next@16.2.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)):
     dependencies:
       next: 16.2.0(@babel/core@7.29.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
 

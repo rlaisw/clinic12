@@ -1,30 +1,39 @@
 {
   "$schema": "https://app.kilo.ai/config.json",
-  
   "mcp": {
     "codebase-memory-mcp": {
       "type": "local",
-      "command": "C:/codebase-memory-mcp/codebase-memory-mcp.exe",
+      "command": ["/usr/local/bin/codebase-memory-mcp"],
       "args": [],
-      "env": {},
+      "env": {
+        "CODEBASE_MEMORY_STORAGE_PATH": "/home/administrator/.local/share/codebase-memory/clinic12",
+        "CODEBASE_MEMORY_CODEBASE_ROOT": "/home/administrator/kilocode/clinic12",
+        "CODEBASE_MEMORY_AUTO_INDEX": "true"
+      },
       "enabled": true,
       "mcp_timeout": 120000,
       "alwaysAllow": ["*"]
     },
     "cocoindex-code": {
       "type": "local",
-      "command": ["ccc", "mcp"],
+      "command": ["/bin/bash", "-c", "cd /home/administrator/kilocode/clinic12 && /home/administrator/.local/bin/ccc mcp"],
+      "env": {
+        "PATH": "/home/administrator/.local/bin:/usr/local/bin:/usr/bin:/bin"
+      },
+      "enabled": true,
+      "mcp_timeout": 120000,
+      "alwaysAllow": ["*"]
+    },
+    "ponytail": {
+      "type": "local",
+      "command": ["node", "/home/administrator/ponytail/ponytail-mcp/index.js"],
+      "args": [],
+      "env": {},
       "enabled": true,
       "mcp_timeout": 120000,
       "alwaysAllow": ["*"]
     }
   },
-  
-  "experimental": {
-    "codebase_search": true,
-    "mcp_timeout": 120000
-  },
-  
   "permission": {
     "bash": "allow"
   }

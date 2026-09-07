@@ -6,7 +6,7 @@
 
 **Status**: Implemented
 
-**Input**: User description: "replace four current theme-mode button by Shadcn/ui - 'Native Select' on landing page 'https://kilo.tail10ee0.ts.net/patient-queue' set the 'Native Select' title to 'Theme Mode' set four <NativeSelectOption> to Dark, White, Blue, Green"
+**Input**: User description: "replace four current theme-mode button by Shadcn/ui - 'Native Select' on landing page 'https://kilo.clinic.com.hk/patient-queue' set the 'Native Select' title to 'Theme Mode' set four <NativeSelectOption> to Dark, White, Blue, Green"
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -93,7 +93,7 @@ The new control must be usable without a mouse and must be correctly labeled for
 
 ## Assumptions
 
-- "Landing page" refers to the patient-queue page (the dashboard layout that currently renders the four theme-mode buttons at `https://kilo.tail10ee0.ts.net/patient-queue`).
+- "Landing page" refers to the patient-queue page (the dashboard layout that currently renders the four theme-mode buttons at `https://kilo.clinic.com.hk/patient-queue`).
 - The requested option labels map to the four existing underlying themes: Dark→`dark`, White→`light`, Blue→`light-blue`, Green→`light-green`. No new themes are introduced.
 - The control is implemented using the Shadcn/ui "Native Select" component (`NativeSelect` / `NativeSelectOption`) as explicitly requested by the user.
 - The existing theme persistence mechanism (localStorage + URL parameter) is reused unchanged.

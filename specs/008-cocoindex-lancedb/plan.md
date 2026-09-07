@@ -10,7 +10,7 @@ Build an embedded RAG system with CocoIndex (processing pipeline) and LanceDB (v
 - **API Framework**: FastAPI + uvicorn
 - **File Processing**: PyPDF2, python-docx (future)
 - **Existing DB**: Django SQLite (read-only access via sqlite3)
-- **Chatbot**: Dify (already deployed at dify.clinic.com.hk)
+- **Chatbot**: Dify (already deployed at kilo.clinic.com.hk)
 
 ## Project Structure
 ```

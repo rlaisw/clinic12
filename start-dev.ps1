@@ -127,7 +127,7 @@ Write-Info "Starting Django Backend on http://localhost:8000 ..."
 $backendJob = Start-Job -ScriptBlock {
     param($dir)
     Set-Location $dir
-    $env:FRONTEND_BASE_URL = "https://kilo.tail10ee0.ts.net"
+    $env:FRONTEND_BASE_URL = "https://kilo.clinic.com.hk"
     $env:PATH = "$dir\venv\Scripts;$env:PATH"
     python manage.py runserver 0.0.0.0:8000 2>&1
 } -ArgumentList $backendDir

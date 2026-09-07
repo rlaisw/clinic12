@@ -1,17 +1,17 @@
 {
   "integration": "kilocode",
-  "version": "0.12.4",
-  "installed_at": "2026-07-06T07:23:52.208091+00:00",
+  "version": "1.0.5.dev0",
+  "installed_at": "2026-09-05T01:40:43.852138+00:00",
   "files": {
-    ".kilocode/workflows/speckit.analyze.md": "b96c62808ed5034a9ef6e869d5d3e344dcd6dec45723840b885cdc68c13bd5ee",
-    ".kilocode/workflows/speckit.clarify.md": "382edae8ae46d96a41c54107269fe2654fe14da0522e58c7daf413c9e501d24a",
-    ".kilocode/workflows/speckit.constitution.md": "6e96c037d6d4e9d37d4f2acbcad33c7764f0c4b633012c36a93a3f51c471f872",
-    ".kilocode/workflows/speckit.implement.md": "b6a19df800252ee3b819ba8d7db838daae14531892672591c8e742711b360a34",
-    ".kilocode/workflows/speckit.converge.md": "8820d0532d9ce673686907a20d42002608bd9738395f4c676eaf1d2102fc55e2",
-    ".kilocode/workflows/speckit.plan.md": "88a43e48619e6769cc0f41296995862e059c343c142013d006a38c32a3bc349a",
-    ".kilocode/workflows/speckit.checklist.md": "af968349453b93c16346b5363fee75ea2957b2dca8a2eb6090a13e3521061a13",
-    ".kilocode/workflows/speckit.specify.md": "03cdf4573683e2566292f89def665972d546c72478dca7bd3e02ad6800fce1f6",
-    ".kilocode/workflows/speckit.tasks.md": "3b987c9332771d0c4f889f5c37e49614b23b3165b35e44814ff2f284f30af85a",
-    ".kilocode/workflows/speckit.taskstoissues.md": "990d4fbb822457ff9f5546a59046b7239dc857e4ca2603f71cabedcbbfa28a44"
+    ".kilo/commands/speckit.analyze.md": "17726d14b58435cc4404c0354448fef67bb5c40e1ce1908d3c76532fff709562",
+    ".kilo/commands/speckit.clarify.md": "ae3efd8a50a67f49ed867eee2c96775928bb4287cc0f195f01a1d53f8a6053b6",
+    ".kilo/commands/speckit.constitution.md": "d76a1ecf2ada88befb6f055650db92f5e3d2ac0ed25795de9e3072fc9cb6484f",
+    ".kilo/commands/speckit.implement.md": "f97b04c981e76e9d08518e85ecb775520fd51965c7cff8b43997bc3e59d4a37f",
+    ".kilo/commands/speckit.converge.md": "170ed41245c6367b5c5a149765df2bd57a196190dca69a6b7f65c21c3227f5b5",
+    ".kilo/commands/speckit.plan.md": "98cc4629e97f2a692fdefb1e3ae1c31059495b63dfaa444cc3ef972cc1ab29c4",
+    ".kilo/commands/speckit.checklist.md": "efca0a3d9dd3e34712a3f9b7bbad5832fca2584ae977b286f56e57d50f53803b",
+    ".kilo/commands/speckit.specify.md": "4317296c28a8ccdbe41c7769147a6d85090815c91634250330f107485607b246",
+    ".kilo/commands/speckit.tasks.md": "aa4b299eb052a31e0ab22d3b2e85324c8247f65b873a2125b4f32dc316201fec",
+    ".kilo/commands/speckit.taskstoissues.md": "1e9a2e305c17195a65e855ef468043e320ef7d1c01181c80fde40925eb5b448c"
   }
 }

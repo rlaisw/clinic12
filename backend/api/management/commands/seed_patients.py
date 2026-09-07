@@ -7,7 +7,7 @@ fake = Faker()
 
 
 class Command(BaseCommand):
-    help = "Seed the database with 50 realistic patients and related data"
+    help = "Seed the database with 30 realistic patients and related data"
 
     def _generate_hkid(self):
         prefix = random.choice('ABCD')
@@ -21,7 +21,7 @@ class Command(BaseCommand):
         Patient.objects.all().delete()
 
         blood_types = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
-        genders = ["M", "F", "O"]
+        genders = ["M", "F"]
         conditions = [
             "Hypertension",
             "Diabetes Type 2",
@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
         patients_created = 0
 
-        for _ in range(10):
+        for _ in range(30):
             first_name = fake.first_name()
             last_name = fake.last_name()
             patient = Patient.objects.create(

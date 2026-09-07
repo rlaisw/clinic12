@@ -71,7 +71,7 @@ export default function PatientDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Gender</span>
-              <span>{patient.gender === "M" ? "Male" : patient.gender === "F" ? "Female" : "Other"}</span>
+              <span>{patient.gender === "M" ? "Male" : "Female"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Phone</span>

@@ -67,6 +67,29 @@ export function PatientTable({ patients, sortBy, sortOrder, onSort, doctorView }
 
   return (
     <>
+      <div className="flex items-center justify-between py-4">
+        <p className="text-sm text-muted-foreground">
+          Page {page + 1} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(page - 1)}
+            disabled={page === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(page + 1)}
+            disabled={page + 1 >= totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -104,7 +127,7 @@ export function PatientTable({ patients, sortBy, sortOrder, onSort, doctorView }
                     </TableCell>
                     <TableCell>{patientItem.hkid || "—"}</TableCell>
                     <TableCell>{formatDate(patientItem.date_of_birth)}</TableCell>
-                    <TableCell>{patientItem.gender === "M" ? "Male" : patientItem.gender === "F" ? "Female" : "Other"}</TableCell>
+                    <TableCell>{patientItem.gender === "M" ? "Male" : "Female"}</TableCell>
                     <TableCell>{patientItem.phone}</TableCell>
                     <TableCell>{patientItem.email || "—"}</TableCell>
                     <TableCell className="text-right">
@@ -131,30 +154,7 @@ export function PatientTable({ patients, sortBy, sortOrder, onSort, doctorView }
               })
             )}
 </TableBody>
-         </Table>
-       </div>
-        <div className="flex items-center justify-between py-4">
-          <p className="text-sm text-muted-foreground">
-            Page {page + 1} of {totalPages}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page - 1)}
-              disabled={page === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(page + 1)}
-              disabled={page + 1 >= totalPages}
-            >
-              Next
-            </Button>
-          </div>
+          </Table>
         </div>
        <EditPatientModal
          patient={editingPatient}

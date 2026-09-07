@@ -237,7 +237,7 @@ export function PatientBackgroundForm({ patientId, disabled }: PatientBackground
           <div>
             <Label>Sex (Read-only)</Label>
             <Input
-              value={patient.gender === "M" ? "Male" : patient.gender === "F" ? "Female" : "Other"}
+              value={patient.gender === "M" ? "Male" : "Female"}
               readOnly
               disabled
               className="bg-muted"

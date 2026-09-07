@@ -73,7 +73,7 @@ The response should include the remarks field:
 
 ### 4. Frontend Verification
 
-1. Navigate to: `https://kilo.tail10ee0.ts.net/doctor/patients/[patient-id]/sick-leave-certificate`
+1. Navigate to: `https://kilo.clinic.com.hk/doctor/patients/[patient-id]/sick-leave-certificate`
 2. Verify the SREF is displayed on the create screen
 3. Fill in the form including the Remarks field
 4. Click "Sign & Issue"

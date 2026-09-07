@@ -192,7 +192,7 @@ export default function DoctorPatientLayout({
       {currentTab === "ai-chatbot" && (
         <div className="mt-4">
           <iframe
-            src="https://dify.clinic.com.hk/chat/o2fx5gTJ9RQJGz4H"
+            src="https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY"
             className="w-full h-[80vh] border rounded"
             title="AI Chatbot"
           />

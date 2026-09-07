@@ -100,7 +100,6 @@ export function CreatePatientModal({ open, onOpenChange }: { open?: boolean; onO
                 >
                   <option value="M">Male</option>
                   <option value="F">Female</option>
-                  <option value="O">Other</option>
                 </select>
               </div>
             </div>

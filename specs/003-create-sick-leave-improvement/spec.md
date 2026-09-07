@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "i want to improve the tab page "create sick leave" url is : https://kilo.tail10ee0.ts.net/doctor/patients/[patient id]/sick-leave-certificate: - Automatically add SREF (unique sick leave reference number) and show on this tab page (create sick leave screen) - Add a new <Textarea>, <Label = Remarks>"
+**Input**: User description: "i want to improve the tab page "create sick leave" url is : https://kilo.clinic.com.hk/doctor/patients/[patient id]/sick-leave-certificate: - Automatically add SREF (unique sick leave reference number) and show on this tab page (create sick leave screen) - Add a new <Textarea>, <Label = Remarks>"
 
 ## User Scenarios & Testing *(mandatory)*
 

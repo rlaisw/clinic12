@@ -61,6 +61,6 @@ Query (RAG API):
 - Dify server at `172.28.51.12`, app ID `499c376a-73fc-4ce2-b201-d025bbeee56f`
 
 ## Integration Points
-- Dify chatbot at `https://dify.clinic.com.hk/chat/u3gp6aJ0gKWnEFDr`
+- Dify chatbot at `https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY`
 - RAG API at `http://172.28.51.11:8001`
 - Existing clinic SQLite at `backend/db.sqlite3`

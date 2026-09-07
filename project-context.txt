@@ -57,21 +57,21 @@
 **Original Problem:** Dify HTTP Request node failing with 403 Forbidden and connection timeout to RAG API.
 
 **Root Cause & Fixes Applied:**
-1. **Tailscale Funnel URL Format** - Changed from `https://kilo.tail10ee0.ts.net:8443/api/rag/query` to `https://kilo.tail10ee0.ts.net/api/rag/query` (removed :8443 port)
+1. **URL Migration** - Changed from `https://kilo.tail10ee0.ts.net` to `https://kilo.clinic.com.hk` (removed Tailscale dependency, using self-signed SSL certificate)
 2. **SSRF Proxy Enabled** - Set `SSRF_PROXY_HTTP_URL=http://ssrf_proxy:3128` and `SSRF_PROXY_HTTPS_URL=http://ssrf_proxy:3128`
 3. **IP Allowlist Configured** - `SSRF_PROXY_ALLOW_PRIVATE_IPS=100.0.0.0/8,10.161.92.142` for Tailscale range and Dify server
 4. **Sandbox Proxy Enabled** - `SANDBOX_HTTP_PROXY=http://ssrf_proxy:3128` and `SANDBOX_HTTPS_PROXY=http://ssrf_proxy:3128`
 
 **Working Configuration:**
-- **RAG API Endpoint:** `https://kilo.tail10ee0.ts.net/api/rag/query`
-- **Token:** `e429e0ee02046d5c2f3933c26d53cf265872ee94`
-- **Method:** POST
+- **RAG API Endpoint:** `https://kilo.clinic.com.hk:8000/api/rag/query`
+- **Token:** `302b3a7bf0ddf403522ec09e642bb95494da5e52`
+- **Method:** GET (schema discovery) / POST (query)
 - **Headers:** 
-  - `Authorization: Token e429e0ee02046d5c2f3933c26d53cf265872ee94`
+  - `Authorization: Token 302b3a7bf0ddf403522ec09e642bb95494da5e52`
   - `Content-Type: application/json`
 - **Body:** JSON format with `query` and `top_k` parameters
-- **SSL:** Enabled (valid Tailscale certificate)
-- **CORS:** Configured to allow Tailscale domains
+- **SSL:** Self-signed certificate at kilo.clinic.com.hk
+- **CORS:** Configured to allow kilo.clinic.com.hk
 
 **Status:** ✅ Working - Successfully fetches patient data from RAG API
 
@@ -87,8 +87,8 @@
 - Backend Configuration: `backend/config/settings.py` line 92-94
 - CORS settings include Tailscale domains in CSRF_TRUSTED_ORIGINS and CORS_ALLOWED_ORIGINS
 - Tailscale funnel running: 
-  - `https://kilo.tail10ee0.ts.net/` → `http://localhost:3001` (Frontend)
-  - `https://kilo.tail10ee0.ts.net:8443/` → `http://127.0.0.1:8000` (Backend API)
+  - `https://kilo.clinic.com.hk/` → `http://localhost:3001` (Frontend)
+  - `https://kilo.clinic.com.hk:8000/` → `http://127.0.0.1:8000` (Backend API)
 - Tailscale IP: `100.90.231.24`
 
 ### KEY FILES MODIFIED ###

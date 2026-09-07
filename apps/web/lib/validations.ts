@@ -48,7 +48,7 @@ export const patientSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   date_of_birth: z.string().min(1, "Date of birth is required"),
-  gender: z.enum(["M", "F", "O"]),
+  gender: z.enum(["M", "F"]),
   address: z.string().optional(),
   phone: z.string().min(1, "Phone is required"),
   email: z.string().email("Invalid email").optional().nullable(),
