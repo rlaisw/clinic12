@@ -1,2 +1,1 @@
-# ponytail: certs/.gitignore covers *.key only — *.crt is intentionally committed for dev convenience
-*.key
+# Dev convenience - both cert and key committed for local development

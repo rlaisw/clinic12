@@ -23,7 +23,7 @@ export const authApi = {
   },
 
   async login(username: string, password: string) {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const response = await fetch(`${API_BASE}/auth/login/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -44,7 +44,7 @@ export const authApi = {
 
   async logout() {
     const token = this.getToken();
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     if (token) {
       await fetch(`${API_BASE}/auth/logout/`, {
         method: "POST",

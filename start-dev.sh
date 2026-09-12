@@ -2,7 +2,7 @@
 set -e
 
 # Add pnpm and node to PATH
-export PATH="/home/administrator/.local/bin:$PATH"
+export PATH="/home/ubuntu/.local/bin:$PATH"
 export HF_TOKEN="${HF_TOKEN:-}"
 
 PROJECT_NAME="clinic12"
@@ -106,11 +106,16 @@ if [ ! -f "$CERT_FILE" ] || [ ! -f "$KEY_FILE" ]; then
     exit 1
 fi
 
-python3 manage.py runserver_plus --help >/dev/null 2>&1 || {
-    log_err "django-extensions is required for HTTPS backend. Install: pip install django-extensions Werkzeug pyOpenSSL"
+VENV_PYTHON="$BACKEND_DIR/venv/bin/python"
+if [ ! -x "$VENV_PYTHON" ]; then
+    log_err "Backend venv not found at $VENV_PYTHON"
+    exit 1
+fi
+"$VENV_PYTHON" manage.py runserver_plus --help >/dev/null 2>&1 || {
+    log_err "django-extensions is required for HTTPS backend. Install: $VENV_PYTHON -m pip install django-extensions Werkzeug pyOpenSSL"
     exit 1
 }
-python3 manage.py runserver_plus 0.0.0.0:8000 --cert "$CERT_FILE" --key "$KEY_FILE" &
+"$VENV_PYTHON" manage.py runserver_plus 0.0.0.0:8000 --cert "$CERT_FILE" --key "$KEY_FILE" &
 BACKEND_PID=$!
 
 sleep 3

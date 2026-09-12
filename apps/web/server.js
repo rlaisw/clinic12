@@ -1,4 +1,5 @@
 import { createServer } from 'https';
+import { request } from 'https';
 import { parse } from 'url';
 import { readFileSync, existsSync } from 'fs';
 import { dirname, join } from 'path';
@@ -14,7 +15,6 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev, port: 3001, dir: __dirname });
 const handle = app.getRequestHandler();
 
-// Error handling: verify certificate and key files exist before starting
 if (!existsSync(certFile)) {
   console.error('Error: Certificate file not found at ' + certFile);
   console.error('Run: bash certs/generate.sh');
@@ -37,8 +37,35 @@ try {
 
 const options = { cert, key };
 
+function proxyToBackend(req, res) {
+  const proxyReq = request(
+    {
+      hostname: '127.0.0.1',
+      port: 8000,
+      path: req.url,
+      method: req.method,
+      headers: { ...req.headers, host: '127.0.0.1:8000' },
+      rejectUnauthorized: false,
+    },
+    (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    }
+  );
+  proxyReq.on('error', (err) => {
+    console.error('Proxy error:', err.message);
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Proxy error', message: err.message }));
+  });
+  req.pipe(proxyReq);
+}
+
 app.prepare().then(() => {
   createServer(options, (req, res) => {
+    if (req.url && req.url.startsWith('/api/')) {
+      proxyToBackend(req, res);
+      return;
+    }
     const parsedUrl = parse(req.url, true);
     handle(req, res, parsedUrl);
   }).listen(3001, '0.0.0.0', () => {

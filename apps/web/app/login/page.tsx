@@ -68,7 +68,7 @@ export default function LoginPage() {
   useEffect(() => {
     const token = authApi.getToken();
     if (token && pathname === "/login") {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
       fetch(`${API_BASE}/auth/user/`, {
         headers: { Authorization: `Token ${token}` },
       }).then((res) => {
