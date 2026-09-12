@@ -1,4 +1,4 @@
-import { createServer } from 'https';
+import { createServer } from 'http';
 import { request } from 'https';
 import { parse } from 'url';
 import { readFileSync, existsSync } from 'fs';
@@ -14,28 +14,6 @@ const keyFile = join(certDir, 'clinic.com.hk.key');
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev, port: 3001, dir: __dirname });
 const handle = app.getRequestHandler();
-
-if (!existsSync(certFile)) {
-  console.error('Error: Certificate file not found at ' + certFile);
-  console.error('Run: bash certs/generate.sh');
-  process.exit(1);
-}
-if (!existsSync(keyFile)) {
-  console.error('Error: Key file not found at ' + keyFile);
-  console.error('Run: bash certs/generate.sh');
-  process.exit(1);
-}
-
-let cert, key;
-try {
-  cert = readFileSync(certFile);
-  key = readFileSync(keyFile);
-} catch (err) {
-  console.error('Error: Failed to read certificate or key files:', err.message);
-  process.exit(1);
-}
-
-const options = { cert, key };
 
 function proxyToBackend(req, res) {
   const proxyReq = request(
@@ -61,7 +39,7 @@ function proxyToBackend(req, res) {
 }
 
 app.prepare().then(() => {
-  createServer(options, (req, res) => {
+  createServer((req, res) => {
     if (req.url && req.url.startsWith('/api/')) {
       proxyToBackend(req, res);
       return;
@@ -69,13 +47,12 @@ app.prepare().then(() => {
     const parsedUrl = parse(req.url, true);
     handle(req, res, parsedUrl);
   }).listen(3001, '0.0.0.0', () => {
-    console.log('> Ready on https://kilo.clinic.com.hk:3001');
-    console.log('> Using certificate: ' + certFile);
+    console.log('> Ready on http://0.0.0.0:3001');
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.error('Error: Port 3001 is already in use. Please stop the conflicting process.');
+      console.error('Error: Port 3001 is already in use.');
     } else {
-      console.error('Error: HTTPS server failed to start:', err.message);
+      console.error('Error: Server failed to start:', err.message);
     }
     process.exit(1);
   });
