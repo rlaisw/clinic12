@@ -16,7 +16,6 @@ const UNIT_OPTIONS = [
 ];
 
 const ROUTE_OPTIONS = ['oral', 'IV', 'IM', 'SC', 'topical', 'inhalation'];
-const FREQUENCY_OPTIONS = ['DAILY', 'BID', 'TID', 'QID', 'PRN', 'WEEKLY', 'MONTHLY'];
 
 export default function AddMedicationPage() {
   const createMedication = useCreateMedication();
@@ -27,7 +26,7 @@ export default function AddMedicationPage() {
     handleSubmit,
     reset,
     formState: { isSubmitting },
-  } = useForm<Record<string, any>>({
+  } = useForm<Record<string, unknown>>({
     defaultValues: {
       name: "",
       generic_name: "",
@@ -45,13 +44,13 @@ export default function AddMedicationPage() {
     },
   });
 
-  const onSubmit = async (data: Record<string, any>) => {
+  const onSubmit = async (data: Record<string, unknown>) => {
     createMedication.mutate(data, {
       onSuccess: () => {
         reset();
       },
-      onError: (error: any) => {
-        setFormError(error?.response?.data ? JSON.stringify(error.response.data) : 'Failed to create medication. Please try again.');
+      onError: (error: unknown) => {
+        setFormError(error instanceof Error ? error.message : 'Failed to create medication. Please try again.');
       },
     });
   };

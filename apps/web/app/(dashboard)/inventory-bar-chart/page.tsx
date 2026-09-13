@@ -10,19 +10,19 @@ interface Medication {
   stockStatus: string;
   stockValue: number;
   outOfStockThreshold: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 async function fetchMedications(): Promise<Medication[]> {
   try {
     const response = await apiClient.get('/medications/');
-    const raw: any[] = response.data;
-    const data = raw.map(m => ({
-      id: m.id ?? m.name,
-      name: m.name ?? (m as any).generic_name,
-      stockStatus: m.stock_status ?? m.stockStatus,
-      stockValue: typeof m.stock_value === 'number' ? m.stock_value : Number((m as any).stock_value ?? 0),
-      outOfStockThreshold: typeof m.threshold_stock_value === 'number' ? m.threshold_stock_value : Number((m as any).threshold_stock_value ?? 0),
+    const raw = response.data as Record<string, unknown>[];
+    const data = raw.map((m) => ({
+      id: (m.id ?? m.name) as string,
+      name: (m.name ?? (m as Record<string, unknown>).generic_name) as string,
+      stockStatus: (m.stock_status ?? m.stockStatus) as string,
+      stockValue: typeof m.stock_value === 'number' ? m.stock_value : Number((m as Record<string, unknown>).stock_value ?? 0),
+      outOfStockThreshold: typeof m.threshold_stock_value === 'number' ? m.threshold_stock_value : Number((m as Record<string, unknown>).threshold_stock_value ?? 0),
     }));
     return data;
   } catch (error) {

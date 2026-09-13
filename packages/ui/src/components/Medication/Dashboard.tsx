@@ -1,6 +1,5 @@
 import { MedicationCard } from './Card';
 import { StockAlerts } from './StockAlerts';
-import { type ReactNode } from 'react';
 
 interface MedicationInventoryProps {
   medications: Array<{

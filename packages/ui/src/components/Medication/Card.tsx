@@ -1,5 +1,4 @@
 import { Card } from '../../card';
-import { type ReactNode } from 'react';
 
 interface MedicationCardProps {
   medication: string;
@@ -7,7 +6,6 @@ interface MedicationCardProps {
   dosageLabel: string;
   expiryDate: string;
   stockValue: number;
-  onDetailsClick?: () => void;
 }
 
 export function MedicationCard({
@@ -16,7 +14,6 @@ export function MedicationCard({
   dosageLabel,
   expiryDate,
   stockValue,
-  onDetailsClick,
 }: MedicationCardProps) {
   const getStatusColor = () => {
     switch (stockStatus) {

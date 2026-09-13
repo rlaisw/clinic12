@@ -54,8 +54,8 @@ export default function MedicationInventoryPage() {
   const filteredMedications = useMemo(() => {
     return medications
       .filter(
-        (med) => med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  med.category.toLowerCase().includes(searchTerm.toLowerCase())
+(med) => med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                   (med.category?.toLowerCase() ?? '').includes(searchTerm.toLowerCase())
       )
       .sort((a, b) => {
         let comparison = 0;
@@ -231,7 +231,7 @@ export default function MedicationInventoryPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              <button type="button" onClick={() => onOpenChange(false)} className="flex-1">
                 Cancel
               </button>
               <button type="submit" disabled={isSubmitting || createMedication.isPending} className="flex-1">
@@ -299,11 +299,11 @@ export default function MedicationInventoryPage() {
     const onSubmit = async (data: Partial<Medication>) => {
       if (!medication) return;
       
-      updateMedication.mutate({ id: medication.id, data }, {
+      updateMedication.mutate({ id: medication.id!, data }, {
         onSuccess: () => {
           onOpenChange(false);
         },
-        onError: (error: any) => {
+        onError: () => {
           setFormError('Failed to save changes. Please try again.');
         },
       });
@@ -382,7 +382,7 @@ export default function MedicationInventoryPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="button" variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+              <button type="button" onClick={() => onOpenChange(false)} className="flex-1">
                 Cancel
               </button>
               <button type="submit" disabled={isSubmitting || updateMedication.isPending} className="flex-1">
@@ -462,7 +462,7 @@ export default function MedicationInventoryPage() {
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(med)}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(med.id)}>
+                    <Button variant="destructive" size="sm" onClick={() => handleDelete(med.id!)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>

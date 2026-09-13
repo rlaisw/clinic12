@@ -13,7 +13,8 @@ import { useUser } from "@/contexts/user-context";
 import { cn } from "@/lib/utils";
 
 export default function DoctorPatientLayout({
-  children: _children,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  children,
 }: {
   children: React.ReactNode;
 }) {

@@ -52,7 +52,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const themes: ThemeMode[] = ['dark', 'light', 'light-blue', 'light-green'];
     const currentIndex = themes.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themes.length;
-    setTheme(themes[nextIndex]);
+    const nextTheme = themes[nextIndex] as ThemeMode;
+    setTheme(nextTheme);
   };
 
   return (

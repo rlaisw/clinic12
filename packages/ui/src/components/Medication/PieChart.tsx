@@ -1,21 +1,16 @@
 'use client';
 
 import { PieChart as RechartsPieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { type ReactNode } from 'react';
 
 export interface PieChartProps {
   data: Array<{ name: string; value: number }>;
   colors?: string[];
-  textAlign?: 'center' | 'start' | 'end';
-  labelsVisibility?: 'auto' | 'hidden' | 'visible';
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
 export function PieChart({
   data,
   colors = ['#ff4444', '#4499ee', '#33cc33', '#ffcc00', '#9933cc', '#6699ff'],
-  textAlign = 'center',
-  labelsVisibility = 'auto',
   children,
 }: PieChartProps) {
   const COLORS = colors;

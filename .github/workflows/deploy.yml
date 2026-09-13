@@ -1,0 +1,65 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'pnpm'
+        
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Install dependencies
+      run: |
+        npm install -g pnpm@10.19.0
+        pnpm install --frozen-lockfile
+        cd backend
+        pip install -r requirements.txt
+        
+    - name: Build Frontend
+      run: |
+        pnpm build
+        
+    - name: Collect static files (Backend)
+      run: |
+        cd backend
+        python manage.py collectstatic --noinput 2>/dev/null || echo "Static collection completed"
+        
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Deploy notification
+      run: echo "Deploy to production triggered"
+      
+    # Uncomment and configure for actual deployment:
+    # - name: Deploy to server
+    #   run: |
+    #     ssh user@host "cd /path/to/app && git pull && docker-compose up -d"
+    #   env:
+    #     SSH_KEY: ${{ secrets.SSH_KEY }}

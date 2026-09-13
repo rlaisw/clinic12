@@ -1,5 +1,4 @@
 import { Card } from '../../card';
-import { type ReactNode } from 'react';
 
 interface StockAlert {
   type: 'LOW_STOCK' | 'EXPIRING_SOON' | 'OUT_OF_STOCK';

@@ -47,6 +47,7 @@ export function PrescriptionTabs({ patientId, disabled }: PrescriptionTabsProps)
     try {
       for (let i = 0; i < prescriptions.length; i++) {
         const presc = prescriptions[i];
+        if (!presc) continue;
         await createPastMed.mutateAsync({
           patient: patientId,
           item: startingItem + i,
@@ -314,13 +315,18 @@ function PrescriptionForm({ patientId, medications, existingCount, prescriptionI
 
   useEffect(() => {
     if (startDate && daysSupply && !Number.isNaN(daysSupply) && Number(daysSupply) > 0) {
-      const [year, month, day] = startDate.split("-").map(Number);
-      const date = new Date(year, month - 1, day);
-      date.setDate(date.getDate() + Number(daysSupply) - 1);
-      const endYyyy = date.getFullYear();
-      const endMm = String(date.getMonth() + 1).padStart(2, "0");
-      const endDd = String(date.getDate()).padStart(2, "0");
-      setValue("end_date", `${endYyyy}-${endMm}-${endDd}`);
+      const parts = startDate.split("-").map(Number);
+      const year = parts[0];
+      const month = parts[1];
+      const day = parts[2];
+      if (year !== undefined && month !== undefined && day !== undefined) {
+        const date = new Date(year, month - 1, day);
+        date.setDate(date.getDate() + Number(daysSupply) - 1);
+        const endYyyy = date.getFullYear();
+        const endMm = String(date.getMonth() + 1).padStart(2, "0");
+        const endDd = String(date.getDate()).padStart(2, "0");
+        setValue("end_date", `${endYyyy}-${endMm}-${endDd}`);
+      }
     }
   }, [startDate, daysSupply, setValue]);
 
