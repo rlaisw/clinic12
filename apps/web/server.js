@@ -1,4 +1,4 @@
-import { createServer } from 'http';
+import { createServer } from 'https';
 import { request } from 'https';
 import { parse } from 'url';
 import { readFileSync, existsSync } from 'fs';
@@ -40,7 +40,11 @@ function proxyToBackend(req, res) {
 
 app.prepare().then(() => {
   const upgradeHandler = app.getUpgradeHandler();
-  const server = createServer((req, res) => {
+  const serverOptions = {
+    key: readFileSync(keyFile),
+    cert: readFileSync(certFile)
+  };
+  const server = createServer(serverOptions, (req, res) => {
     if (req.url && req.url.startsWith('/api/')) {
       proxyToBackend(req, res);
       return;
@@ -54,7 +58,7 @@ app.prepare().then(() => {
   });
 
   server.listen(3001, '0.0.0.0', () => {
-    console.log('> Ready on http://0.0.0.0:3001');
+    console.log('> Ready on https://0.0.0.0:3001');
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       console.error('Error: Port 3001 is already in use.');
