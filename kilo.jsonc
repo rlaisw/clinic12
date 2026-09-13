@@ -3,11 +3,11 @@
   "mcp": {
     "codebase-memory-mcp": {
       "type": "local",
-      "command": ["/usr/local/bin/codebase-memory-mcp"],
+      "command": ["/home/ubuntu/.local/bin/codebase-memory-mcp"],
       "args": [],
       "env": {
-        "CODEBASE_MEMORY_STORAGE_PATH": "/home/administrator/.local/share/codebase-memory/clinic12",
-        "CODEBASE_MEMORY_CODEBASE_ROOT": "/home/administrator/kilocode/clinic12",
+        "CODEBASE_MEMORY_STORAGE_PATH": "/home/ubuntu/.local/share/codebase-memory/clinic12",
+        "CODEBASE_MEMORY_CODEBASE_ROOT": "/home/ubuntu/kilocode/clinic12",
         "CODEBASE_MEMORY_AUTO_INDEX": "true"
       },
       "enabled": true,
@@ -16,9 +16,9 @@
     },
     "cocoindex-code": {
       "type": "local",
-      "command": ["/bin/bash", "-c", "cd /home/administrator/kilocode/clinic12 && /home/administrator/.local/bin/ccc mcp"],
+      "command": ["/bin/bash", "-c", "cd /home/ubuntu/kilocode/clinic12 && /home/ubuntu/.local/bin/ccc mcp"],
       "env": {
-        "PATH": "/home/administrator/.local/bin:/usr/local/bin:/usr/bin:/bin"
+        "PATH": "/home/ubuntu/.local/bin:/usr/local/bin:/usr/bin:/bin"
       },
       "enabled": true,
       "mcp_timeout": 120000,
@@ -26,7 +26,7 @@
     },
     "ponytail": {
       "type": "local",
-      "command": ["node", "/home/administrator/ponytail/ponytail-mcp/index.js"],
+      "command": ["node", "/home/ubuntu/ponytail/ponytail-mcp/index.js"],
       "args": [],
       "env": {},
       "enabled": true,

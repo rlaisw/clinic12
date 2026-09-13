@@ -39,14 +39,21 @@ function proxyToBackend(req, res) {
 }
 
 app.prepare().then(() => {
-  createServer((req, res) => {
+  const upgradeHandler = app.getUpgradeHandler();
+  const server = createServer((req, res) => {
     if (req.url && req.url.startsWith('/api/')) {
       proxyToBackend(req, res);
       return;
     }
     const parsedUrl = parse(req.url, true);
     handle(req, res, parsedUrl);
-  }).listen(3001, '0.0.0.0', () => {
+  });
+
+  server.on('upgrade', (req, socket, head) => {
+    upgradeHandler(req, socket, head);
+  });
+
+  server.listen(3001, '0.0.0.0', () => {
     console.log('> Ready on http://0.0.0.0:3001');
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {

@@ -1,5 +1,5 @@
 #!/bin/bash
 # Force the correct working directory before starting the MCP server
-cd /home/administrator/kilocode/clinic12
+cd /home/ubuntu/kilocode/clinic12
 # Execute the MCP server
-exec /home/administrator/.local/bin/ccc mcp
+exec /home/ubuntu/.local/bin/ccc mcp
