@@ -48,6 +48,9 @@ jobs:
         
     - name: Run type checking (Frontend)
       run: |
+        # Build @repo/ui first: web depends on its dist/ (gitignored, not
+        # produced by pnpm install), so tsc fails to resolve '@repo/ui' types.
+        pnpm --filter @repo/ui run build:components
         pnpm --filter web run check-types
         
     - name: Run tests (Backend)
