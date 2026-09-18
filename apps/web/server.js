@@ -200,10 +200,16 @@ app.prepare().then(() => {
     }
     // Anything else (including /_next/ and /favicon.ico) hits this app's own
     // Next.js dev server, so our app's chunks are never routed to Dify.
-    // WHATWG URL: legacy url.parse() is deprecated (DEP0169) and its
-    // non-standard behavior is no longer CVE-patched by Node.
-    const parsedUrl = new URL(req.url, 'http://localhost');
-    parsedUrl.query = Object.fromEntries(parsedUrl.searchParams);
+    // WHATWG URL replaces legacy url.parse() (deprecated DEP0169, no longer
+    // CVE-patched). Pass Next only pathname/query/hash as a plain object:
+    // passing the full URL object (with hostname "localhost") makes Next's
+    // dev host-check 308-redirect every funnel request to http://localhost.
+    const u = new URL(req.url, 'http://localhost');
+    const parsedUrl = {
+      pathname: u.pathname,
+      query: Object.fromEntries(u.searchParams),
+      hash: u.hash,
+    };
     handle(req, res, parsedUrl);
   });
 
