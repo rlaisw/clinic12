@@ -1,3 +1,6 @@
+import logging
+import traceback
+
 from rest_framework import viewsets, filters, status, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action, permission_classes
@@ -9,6 +12,8 @@ from django.db import transaction
 from django.conf import settings
 from datetime import date
 from ..models import Receipt, Patient
+
+logger = logging.getLogger(__name__)
 from .serializers import ReceiptSerializer, ReceiptListSerializer, ReceiptVerifySerializer
 from ..utils import generate_receipt_number, generate_receipt_qr_code_token, generate_receipt_pdf_from_template, verify_receipt_qr_code_token, amount_to_english_words
 from ..views import DoctorPermission
@@ -84,9 +89,24 @@ class ReceiptViewSet(viewsets.ModelViewSet):
         try:
             pdf_bytes = generate_receipt_pdf_from_template(receipt, base_url=base_url)
         except Exception as e:
-            import traceback
-            traceback.print_exc()
-            return Response({'error': str(e)}, status=500)
+            # Log the full detail server-side (stack trace + receipt context),
+            # return only a safe, user-meaningful summary to the client.
+            logger.error(
+                "Receipt PDF generation failed. receipt_id=%s rref=%s error_type=%s error=%s",
+                getattr(receipt, "id", None),
+                getattr(receipt, "rref", None),
+                type(e).__name__,
+                e,
+                exc_info=True,
+            )
+            return Response(
+                {
+                    "error": "Receipt PDF generation failed. Please try again or contact support.",
+                    "error_type": type(e).__name__,
+                    "receipt_id": str(getattr(receipt, "id", "")),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         return HttpResponse(pdf_bytes, content_type='application/pdf', headers={
             'Content-Disposition': f'attachment; filename="receipt-{receipt.id}.pdf"'
         })

@@ -3,6 +3,28 @@
 import { useState, useCallback } from "react";
 import { apiClient } from "@/lib/api";
 
+/** Best-effort parse of the backend's structured JSON error payload. */
+function parsePdfError(err: any, fallback: string): Error {
+  try {
+    // Error bodies arrive as ArrayBuffer (responseType: "arraybuffer").
+    const data = err?.response?.data;
+    if (data && data.byteLength) {
+      const text = new TextDecoder().decode(data);
+      const json = text ? JSON.parse(text) : null;
+      if (json?.error) {
+        const detail = json.error_type ? ` (${json.error_type})` : "";
+        return new Error(`${json.error}${detail}`);
+      }
+    } else if (data?.error) {
+      const detail = data.error_type ? ` (${data.error_type})` : "";
+      return new Error(`${data.error}${detail}`);
+    }
+  } catch {
+    // Ignore parse failures; fall through to the default path.
+  }
+  return err instanceof Error ? err : new Error(err?.message || fallback);
+}
+
 export function useReceiptPreview(receiptId: string) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +45,7 @@ export function useReceiptPreview(receiptId: string) {
       const dataUrl = `data:application/pdf;base64,${base64}`;
       setPdfUrl(dataUrl);
     } catch (err: any) {
-      setError(err instanceof Error ? err : new Error(err?.message || "Failed to load PDF"));
+      setError(parsePdfError(err, `Failed to load PDF for receipt ${receiptId}`));
     } finally {
       setIsLoading(false);
     }
