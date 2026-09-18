@@ -132,7 +132,7 @@ workflow:
         title: Clinic RAG Search
         type: http-request
         method: post
-        url: http://172.28.51.11:8001/query
+        url: https://vps.tailb5775.ts.net:8000/api/rag/query
         authorization:
           type: no-auth
         headers: 'Content-Type: application/json'
@@ -219,7 +219,13 @@ Context:
 
 Question: {{#sys.query#}}
 
-If no relevant records, say so.'
+If no relevant records, say so.
+
+When you generate SQL, remember:
+- First check each relevant table''s row_count. If the table has row_count 0, answer "none found" immediately — do NOT dump the schema.
+- api_activemedication holds CURRENT prescriptions (name, dosage, route, frequency, days_supply, start_date, diagnostic_result). Use it for ''what patients are prescribed / taking a medication'' questions.
+- api_prescriptionmedication is legacy and usually EMPTY — prefer api_activemedication.
+- Join api_activemedication with api_patient on patient_id to report patient names.'
         - role: user
           text: '{{#sys.query#}}'
         selected: false

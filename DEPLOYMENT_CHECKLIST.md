@@ -1,74 +1,57 @@
-# Clinic Medication Module - Production Deployment Checklist
+# Clinic12 - Production Deployment Checklist
 
 ## Pre-Deployment Requirements
 
 ### 1. Environment Preparation
-- [ ] Verify Python 3.14+ runtime availability
-- [ ] Confirm PostgreSQL/MySQL database connectivity
-- [ ] Set up environment variables (.env):
-  - DJANGO_SECRET_KEY
-  - DATABASE_URL
-  - DEBUG=False
+- [ ] Verify Python 3.12+ runtime availability (`python3 --version`)
+- [ ] Node.js >= 18 + pnpm 10.x: `npm install -g pnpm@10.19.0`
+- [ ] Set up environment variables in `backend/.env`:
+  - DJANGO_SECRET_KEY (generate: `openssl rand -hex 32`)
+  - DATABASE_URL=sqlite:///db.sqlite3 (dev) or your PostgreSQL DSN
+  - DEBUG=False (production)
   - ALLOWED_HOSTS=[production_domain]
-  - EMAIL_BACKEND (for alerts)
-  - CORS_ALLOWED_ORIGINS
-  - DIFY_BASE_URL=https://kilo.clinic.com.hk
-  - DIFY_API_KEY=app-Iw2t4FSLM8xCc3y2vbcEWXKa
-  - DIFY_API_KEY (set in production)
-  - LANCEDB_URI (vector database path)
-  - SSRF_PROXY_HTTP_URL=http://ssrf_proxy:3128
-  - SSRF_PROXY_HTTPS_URL=http://ssrf_proxy:3128
-  - SSRF_PROXY_ALLOW_PRIVATE_IPS=100.0.0.0/8,10.161.92.142
+  - FRONTEND_BASE_URL=https://vps.tailb5775.ts.net
+  - DIFY_BASE_URL=https://vps.tailb5775.ts.net
+  - HF_TOKEN
+- [ ] Frontend env `apps/web/.env`: `NEXT_PUBLIC_API_URL=/api`
 
 ### 2. Security Configuration
-- [ ] Run Django security checks: `python manage.py check --deploy`
-- [ ] Configure HTTPS/SSL certificates
-- [ ] Set up CSRF_TRUSTED_ORIGINS
-- [ ] Configure SECURE_BROWSER_XSS_FILTER=True
-- [ ] Set SECURE_CONTENT_TYPE_NOSNIFF=True
-- [ ] Enable SECURE_HSTS_SECONDS (minimum 31536000 for production)
+- [ ] Run Django security checks: `backend/venv/bin/python manage.py check --deploy`
+- [ ] Configure HTTPS/SSL certificates (`bash certs/generate.sh`)
+- [ ] Set up CSRF_TRUSTED_ORIGINS / CORS_ALLOWED_ORIGINS in `backend/config/settings.py` (contains `vps.tailb5775.ts.net`
+      and dev IPs)
+- [ ] Set SECURE_BROWSER_XSS_FILTER / SECURE_CONTENT_TYPE_NOSNIFF / SECURE_HSTS_SECONDS for production
 - [ ] Configure SSRF proxy settings to restrict internal access
-- [ ] Set up Tailscale Funnel for secure external access
+- [ ] Set up Tailscale Funnel for secure external access (see below)
 - [ ] Verify token-based authentication for all API endpoints
 
 ### 3. Database Preparation
-- [ ] Run migrations: `python manage.py migrate`
+- [ ] Run migrations: `backend/venv/bin/python manage.py migrate`
+- [ ] Create initial roles/users (e.g., `setup_roles` script)
 - [ ] Create database backup strategy
-- [ ] Set up database connection pooling
-- [ ] Verify medication data integrity (foreign keys, constraints)
-- [ ] Create initial medication categories if needed
 - [ ] Set up LanceDB for RAG embeddings (if using AI features)
 
 ### 4. Static Files & Assets
-- [ ] Collect static files: `python manage.py collectstatic`
-- [ ] Configure CDN for static/media assets
-- [ ] Verify Tailwind CSS production build
-- [ ] Optimize images in medication assets
-- [ ] Set up PDF template storage for receipts and certificates
+- [ ] Collect static files: `backend/venv/bin/python manage.py collectstatic`
+- [ ] Verify Next.js production build: `pnpm build`
+- [ ] Configure CDN for static/media assets (optional)
 
 ### 5. Application Configuration
 - [ ] Set LOGGING configuration for production
-- [ ] Configure cache backend (Redis/Memcached)
-- [ ] Set up Celery for background tasks (if applicable)
-- [ ] Configure file storage (AWS S3, Google Cloud, etc.)
-- [ ] Set up monitoring and error tracking (Sentry)
+- [ ] Configure cache backend (Redis/Memcached) if applicable
+- [ ] Set up monitoring and error tracking (Sentry) if applicable
 - [ ] Configure Dify API endpoints for AI features
-- [ ] Set up Tailscale Funnel for secure external access
 
 ### 6. Testing & Validation
-- [ ] Run full test suite: `python manage.py test`
-- [ ] Perform load testing on medication endpoints
-- [ ] Verify API response times (<200ms for GET, <500ms for POST/PUT)
-- [ ] Test alert triggering mechanisms
-- [ ] Validate stock calculation accuracy
-- [ ] Test AI chatbot integration and RAG query functionality
+- [ ] Run backend test suite: `backend/venv/bin/python manage.py test`
+- [ ] Run CI pipeline locally: `pnpm --filter web run check-types`, `pnpm --filter web exec eslint --max-warnings 999`
 - [ ] Test receipt generation and QR code verification
 - [ ] Test sick leave certificate generation and verification
 - [ ] Test Tailscale tunnel connectivity
+- [ ] Test AI chatbot integration and RAG query functionality
 
 ### 7. Deployment Process
-- [ ] Create deployment scripts (bash, Docker, or CI/CD)
-- [ ] Set up blue-green or rolling deployment strategy
+- [ ] CI/CD via GitHub Actions (`.github/workflows/ci.yml` + `deploy.yml`)
 - [ ] Configure health check endpoints
 - [ ] Set up rollback procedures
 - [ ] Document deployment steps for team
@@ -79,10 +62,42 @@
 - [ ] Test medication creation/update/deletion
 - [ ] Confirm alert system functioning
 - [ ] Check logs for errors/warnings
-- [ ] Verify backup restoration process
 - [ ] Test AI chatbot functionality
 - [ ] Test receipt and certificate generation
-- [ ] Verify Tailscale tunnel connectivity
+- [ ] Verify Tailscale funnel connectivity
+
+## HTTPS / Reverse Proxy Setup (this project)
+
+One public listener (`https://vps.tailb5775.ts.net/` = Tailscale funnel → Next.js :3001) proxies to both backends:
+
+1. **Regenerate certs** (San covers `vps.tailb5775.ts.net` + `clinic.com.hk`): `bash certs/generate.sh`
+2. **Start backend + frontend**: `bash start-all.sh fg`
+   - Backend: `https://127.0.0.1:8000` (Werkzeug, self-signed)
+   - Frontend: `https://127.0.0.1:3001` (`server.js`, self-signed)
+3. **Tailscale Funnel** exposes the frontend publicly:
+   ```bash
+   tailscale funnel --bg https+insecure://127.0.0.1:3001
+   ```
+   → `https://vps.tailb5775.ts.net/`
+4. **Origin proxy** (`apps/web/server.js`) routes internally:
+   - `/api/*` → Django :8000
+   - `/dify/*`, `/chat/*`, `/socket.io/*`, `/assets/` → Dify `10.0.1.75:80` (no public :443 listener needed)
+5. **Port ownership**:
+   - Dify nginx binds `10.0.1.75:80/443` only (set `EXPOSE_NGINX_PORT=10.0.1.75:80`, `EXPOSE_NGINX_SSL_PORT=10.0.1.75:443`)
+   - Funnel binds `100.73.67.34:443` — both coexist on the same host.
+6. **Dev HMR**: funnel host must be in `apps/web/next.config.ts` → `allowedDevOrigins`.
+
+## Port Reference
+| Port | Service | Protocol |
+|---|---|---|
+| 3000 | docs (Next.js, unused in prod) | HTTP |
+| 3001 | Next.js frontend + origin proxy | HTTPS (self-signed) |
+| 8000 | Django backend | HTTPS (self-signed) |
+| 80/443 | Dify nginx (bound to `10.0.1.75`) | HTTP/HTTPS (internal only) |
+
+## Code Search Index (optional, for dev)
+- cocoindex-code: `ccc index` (project-level `.cocoindex_code/`)
+- codebase-memory: graph index, auto-refresh
 
 ## Medication-Specific Checks
 
@@ -102,19 +117,19 @@
 - [ ] Test inventory valuation reports
 - [ ] Confirm expiry date reporting
 
-## AI Features (NEW)
+## AI Features
 
 ### RAG System
 - [ ] Verify LanceDB embeddings are up to date
-- [ ] Test patient data retrieval via RAG API
+- [ ] Test patient data retrieval via RAG API (`https://vps.tailb5775.ts.net:8000/api/rag/query`)
 - [ ] Verify hybrid search functionality works correctly
 - [ ] Test patient ID extraction from queries
 
 ### AI Chatbot
-- [ ] Verify Dify chatbot loads in iframe
-- [ ] Test chatbot responses for patient queries
-- [ ] Verify authentication tokens are valid
-- [ ] Test Tailscale tunnel connectivity
+- [ ] Verify the in-app AI Chatbot tab loads (`/doctor/patients/{id}/ai-chatbot` → `DifyChat`)
+- [ ] Test chatbot responses for patient queries (direct API via `/dify/api/chat-messages`)
+- [ ] Verify authentication (Dify webapp passport + Django token) is valid
+- [ ] Long queries may take > 3 min (LLM table re-formatting) — proxy timeout is 420 s
 
 ### Document Generation
 - [ ] Test receipt PDF generation with fillable fields
@@ -125,7 +140,7 @@
 ## Infrastructure Checks
 
 ### Tailscale Configuration
-- [ ] Verify Tailscale Funnel is running
+- [ ] Verify Tailscale Funnel is running: `tailscale funnel status`
 - [ ] Test HTTPS endpoints via Tailscale
 - [ ] Verify tunnel connectivity from external networks
 
@@ -135,6 +150,6 @@
 - [ ] Verify IP allowlisting is working correctly
 
 ### Database
-- [ ] Verify PostgreSQL is running and accessible
+- [ ] Verify SQLite/PostgreSQL is running and accessible
 - [ ] Test database backup and restore procedures
 - [ ] Monitor database performance and connection counts

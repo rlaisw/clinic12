@@ -9,6 +9,7 @@ import { DataVisualizationTab } from "@/components/doctor/data-visualization-tab
 import { PrescriptionTabs } from "@/components/doctor/prescription-tabs";
 import { SickLeaveCertificateTabs } from "@/components/doctor/sick-leave-certificate-tabs";
 import { ReceiptTabs } from "@/components/doctor/receipt-tabs";
+import { DifyChat } from "@/components/doctor/dify-chat";
 import { useUser } from "@/contexts/user-context";
 import { cn } from "@/lib/utils";
 
@@ -192,11 +193,7 @@ export default function DoctorPatientLayout({
 
       {currentTab === "ai-chatbot" && (
         <div className="mt-4">
-          <iframe
-            src="https://kilo.clinic.com.hk/chat/CwuSNzcg0bsrG2lY"
-            className="w-full h-[80vh] border rounded"
-            title="AI Chatbot"
-          />
+          <DifyChat appCode="45322G8rzGMEW7WP" />
         </div>
       )}
     </div>

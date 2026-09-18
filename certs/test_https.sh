@@ -8,8 +8,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CERT_FILE="$SCRIPT_DIR/clinic.com.hk.crt"
 KEY_FILE="$SCRIPT_DIR/clinic.com.hk.key"
-FRONTEND_URL="https://kilo.clinic.com.hk:3001"
-BACKEND_URL="https://kilo.clinic.com.hk:8000"
+FRONTEND_URL="https://vps.tailb5775.ts.net:3001"
+BACKEND_URL="https://vps.tailb5775.ts.net:8000"
 
 PASS=0
 FAIL=0
@@ -23,19 +23,19 @@ test_us1_cert_cn() {
   echo "TEST: US1 - Certificate CN validation"
   local cn
   cn=$(openssl x509 -in "$CERT_FILE" -noout -subject 2>/dev/null | sed -n 's/.*CN *= *\([^,]*\).*/\1/p')
-  if [ "$cn" = "kilo.clinic.com.hk" ]; then
-    test_pass "Certificate CN is kilo.clinic.com.hk"
+  if [ "$cn" = "vps.tailb5775.ts.net" ]; then
+    test_pass "Certificate CN is vps.tailb5775.ts.net"
   else
-    test_fail "Certificate CN is '$cn', expected 'kilo.clinic.com.hk'"
+    test_fail "Certificate CN is '$cn', expected 'vps.tailb5775.ts.net'"
   fi
 }
 
 test_us1_cert_sans() {
   echo "TEST: US1 - Certificate SANs validation"
-  if openssl x509 -in "$CERT_FILE" -noout -ext subjectAltName 2>/dev/null | grep -q "kilo.clinic.com.hk"; then
-    test_pass "SAN includes kilo.clinic.com.hk"
+  if openssl x509 -in "$CERT_FILE" -noout -ext subjectAltName 2>/dev/null | grep -q "vps.tailb5775.ts.net"; then
+    test_pass "SAN includes vps.tailb5775.ts.net"
   else
-    test_fail "SAN missing kilo.clinic.com.hk"
+    test_fail "SAN missing vps.tailb5775.ts.net"
   fi
   if openssl x509 -in "$CERT_FILE" -noout -ext subjectAltName 2>/dev/null | grep -q "clinic.com.hk"; then
     test_pass "SAN includes clinic.com.hk"

@@ -57,8 +57,8 @@ if [ ! -f "$KEY_FILE" ] || [ ! -s "$KEY_FILE" ]; then
 fi
 
 # Validate: SANs include required domains
-if ! openssl x509 -noout -ext subjectAltName -in "$CERT_FILE" 2>/dev/null | grep -q "kilo.clinic.com.hk"; then
-  echo "Error: Certificate does not include required SAN: kilo.clinic.com.hk" >&2
+if ! openssl x509 -noout -ext subjectAltName -in "$CERT_FILE" 2>/dev/null | grep -q "vps.tailb5775.ts.net"; then
+  echo "Error: Certificate does not include required SAN: vps.tailb5775.ts.net" >&2
   rm -f "$CERT_FILE" "$KEY_FILE"
   exit 1
 fi
@@ -79,6 +79,6 @@ fi
 echo "✓ Self-signed certificate generated successfully"
 echo "  Certificate: $CERT_FILE"
 echo "  Private Key: $KEY_FILE"
-echo "  Domains: kilo.clinic.com.hk, clinic.com.hk"
+echo "  Domains: vps.tailb5775.ts.net, clinic.com.hk"
 echo "  Validity: 30 years"
 echo "  Key: RSA 4096-bit"

@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters, status, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action, api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from django.http import HttpResponse
 from django.utils import timezone
@@ -427,63 +427,96 @@ def sql_query(request):
     if not raw:
         return Response({"error": "sql is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-# Extract the first SQL statement from text (handles LLM output with thinking/reasoning).
-    if '```' in raw:
-        # Prefer extracting SQL from the first code fence block.
-        parts = raw.split('```')
-        for i, part in enumerate(parts):
-            if part.startswith('sql\n') or part.startswith('sql\r\n'):
-                sql = part.split('\n', 1)[1]
-                break
-            # Also try the plain text block after the fence
-            if i > 0 and not part.startswith('sql') and not part.startswith('\n'):
-                block = part.strip()
-                if re.search(r'^\s*(?:WITH\b|SELECT\b)', block, re.IGNORECASE):
-                    sql = block
-                    break
-    else:
-        # Look for WITH (CTE pattern) or SELECT — skip plain-English "select" matches.
-        # Match SELECT only when followed by SQL tokens (column, *, COUNT, DISTINCT, FROM, CASE, etc.)
-        sql_start_pattern = r'\b(WITH\s+\w+\s+AS\s*\()|(\bSELECT\s+(?:DISTINCT\s+)?(?:\*|CAST|COALESCE|COUNT|CASE|SUM|AVG|MIN|MAX|ROUND|GROUP|ORDER|FROM|\w[\w.]*|\d))'
-        matches = list(re.finditer(sql_start_pattern, raw, re.IGNORECASE))
+# Strip reasoning preambles models sometimes emit before the SQL
+    # ("thinking\n...\nresponseSELECT ... ;"). Greedy up to the LAST "response"
+    # marker so prose mentions of the word don't cut the real statement.
+    import re as _re
+    raw = _re.sub(r'^\s*(?:thinking|reasoning)\b.*\bresponse\s*', '', raw, flags=_re.I | _re.S)
+    raw = raw.strip()
+
+# Extract candidate SQL statements from text (handles LLM output with
+    # thinking/reasoning, tool-call wrappers and fenced blocks).
+    sql_start_pattern = r'\b(WITH\s+\w+\s+AS\s*\()|(\bSELECT\s+(?:DISTINCT\s+)?(?:\*|CAST|COALESCE|COUNT|CASE|SUM|AVG|MIN|MAX|ROUND|GROUP|ORDER|FROM|\w[\w.]*|\d))'
+    candidates = [
+        block.strip() for block in re.findall(r'```[^\n]*\n(.*?)```', raw, re.S)
+    ] if '```' in raw else []
+    candidates.append(raw)
+
+    statements = []
+    for cand in candidates:
+        matches = list(re.finditer(sql_start_pattern, cand, re.IGNORECASE))
         if not matches:
-            return Response({"error": "no SELECT or WITH query found in input"}, status=status.HTTP_403_FORBIDDEN)
-        sql = raw[matches[-1].start():]
-    sql = sql.rstrip(';').strip()
-    # Strip any existing LIMIT clause (app is added below).
-    sql_no_limit = re.sub(r'\s+LIMIT\s+\d+(?:\s*(?:OFFSET\s+\d+)?)?\s*$', '', sql, flags=re.IGNORECASE)
+            continue
+        # Try the outermost statement first, then the last one (the reasoning
+        # preamble often contains a prose "we need SELECT ..." before the real
+        # statement; UNION subqueries still resolve fine from the outermost).
+        for pos in sorted({matches[0].start(), matches[-1].start()}):
+            stmt = cand[pos:]
+            stmt = re.sub(r'<\|[^|]*\|>', '', stmt)  # <|tool_call_start|>/…
+            stmt = re.sub(r'\[(?:sql|query)\s*\(\s*[\'"]?', '', stmt)  # [sql('
+            stmt = re.sub(r'[\'"]?\s*\)\]', '', stmt)  # ')] suffix
+            stmt = stmt.split(';')[0].strip().rstrip(';').strip()
+            stmt = re.sub(r'\s+LIMIT\s+\d+(?:\s*(?:OFFSET\s+\d+)?)?\s*$', '', stmt, flags=re.IGNORECASE)
+            if stmt and stmt not in statements:
+                statements.append(stmt)
+    if not statements:
+        return Response({"error": "no SELECT or WITH query found in input"}, status=status.HTTP_403_FORBIDDEN)
 
     db_path = settings.DATABASES['default']['NAME']
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
+    last_error = None
     try:
-        cursor = conn.cursor()
-        cursor.execute(f"{sql_no_limit} LIMIT 200")
-        rows = [dict(r) for r in cursor.fetchall()]
-        # Get total count.
-        try:
-            cursor.execute(f"SELECT COUNT(*) as cnt FROM ({sql_no_limit})")
-            total = cursor.fetchone()["cnt"]
-        except Exception:
-            # CTE queries can't be wrapped in a subquery, count with a separate cursor.
-            c2 = conn.cursor()
-            c2.execute(sql_no_limit)
-            total = len(c2.fetchall())
-        return Response({
-            "total": total,
-            "limit": 200,
-            "rows": rows,
-        })
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        for sql in statements:
+            try:
+                cursor = conn.cursor()
+                cursor.execute(f"{sql} LIMIT 200")
+                rows = [dict(r) for r in cursor.fetchall()]
+                try:
+                    cursor.execute(f"SELECT COUNT(*) as cnt FROM ({sql})")
+                    total = cursor.fetchone()["cnt"]
+                except Exception:
+                    c2 = conn.cursor()
+                    c2.execute(sql)
+                    total = len(c2.fetchall())
+                return Response({
+                    "total": total,
+                    "limit": 200,
+                    "rows": rows,
+                })
+            except Exception as e:
+                last_error = e
+        return Response({"error": str(last_error)}, status=status.HTTP_400_BAD_REQUEST)
     finally:
         conn.close()
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def sql_schema(request):
     """Return all table schemas — Dify calls this first to learn column names."""
+    # Root-cause guidance: the bot picked the empty api_prescriptionmedication over
+    # api_activemedication because the name sounds canonical. Description steers it.
+    TABLE_NOTES = {
+        "api_activemedication": (
+            "CURRENT prescriptions (name, dosage, route, frequency, days_supply, "
+            "start_date, diagnostic_result). USE this table for 'what patients are "
+            "prescribed / taking a medication' questions."
+        ),
+        "api_prescriptionmedication": (
+            "Legacy prescription table. USUALLY EMPTY (0 rows); prefer api_activemedication for "
+            "prescribed-medication questions."
+        ),
+        "api_patient": "Patient demographics (first_name, last_name, hkid, phone, blood_type, allergies).",
+        "api_medicalhistory": "Patient medical conditions (condition, diagnosis_date, notes).",
+        "api_allergy": "Patient allergies (substance, reaction, severity).",
+        "api_sickleavecertificate": "Issued sick leave certificates.",
+        "api_receipt": "Financial receipts (medications, investigations, diagnosis, totals).",
+        "api_patientbackground": "Chief complaint, past/social/family history per patient.",
+        "api_queueentry": "Queue/waiting-room entries (status, check_in_time, room).",
+        "medication_medication": "Medication catalog/catalog-of-stock drugs (name, strength, stock). Not patient-specific.",
+    }
     from django.db import connection
     tables = connection.introspection.table_names()
     schema = {}
@@ -500,4 +533,6 @@ def sql_schema(request):
         cursor.execute(f"SELECT COUNT(*) FROM {table}")
         count = cursor.fetchone()[0]
         schema[table] = {"row_count": count, "columns": columns}
+        if table in TABLE_NOTES:
+            schema[table]["description"] = TABLE_NOTES[table]
     return Response({"tables": schema})

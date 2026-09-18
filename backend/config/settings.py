@@ -90,7 +90,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 PUBLIC_VERIFY_BASE_URL = os.environ.get('PUBLIC_VERIFY_BASE_URL', 'http://localhost:8000')
 FRONTEND_BASE_URL = os.environ.get('FRONTEND_BASE_URL', 'http://localhost:3001')
-DIFY_BASE_URL = os.environ.get('DIFY_BASE_URL', 'https://kilo.clinic.com.hk')
+DIFY_BASE_URL = os.environ.get('DIFY_BASE_URL', 'https://vps.tailb5775.ts.net')
 DIFY_API_KEY = os.environ.get('DIFY_API_KEY', 'app-Iw2t4FSLM8xCc3y2vbcEWXKa')
 LANCEDB_URI = os.environ.get('LANCEDB_URI', 'lancedb')
 HF_TOKEN = os.environ.get('HF_TOKEN', '')
@@ -125,8 +125,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://10.161.92.149:3001',
     'http://172.18.206.86:3001',
     'http://172.18.206.86:8000',
-    'https://kilo.clinic.com.hk:3001',
-    'https://kilo.clinic.com.hk:8000',
+    'https://vps.tailb5775.ts.net:3001',
+    'https://vps.tailb5775.ts.net:8000',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -136,8 +136,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.161.92.149:3001',
     'http://172.18.206.86:3001',
     'http://172.18.206.86:8000',
-    'https://kilo.clinic.com.hk:3001',
-    'https://kilo.clinic.com.hk:8000',
+    'https://vps.tailb5775.ts.net:3001',
+    'https://vps.tailb5775.ts.net:8000',
 ]
 
 CORS_ALLOW_CREDENTIALS = True

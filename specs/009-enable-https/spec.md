@@ -4,7 +4,7 @@
 
 **Created**: 2026-09-05
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "i want to enable https in current project clinic12 - i added "10.161.92.142  kilo.clinic.com.hk" in /etc/hosts file - help to create a self sign certificate 30 years with domain name clinic.com.hk"
 
@@ -16,6 +16,8 @@
 - Q: Should the certificate include the IP address 10.161.92.142 as a SAN? → A: No — domain names only
 - Q: Is HTTPS required for the Django backend (port 8000), or only the frontend? → A: Both frontend and backend must serve HTTPS
 - Q: What RSA key size should the certificate use? → A: RSA 4096
+
+> **Post-implementation note**: the deployment moved from the local dev hostname `kilo.clinic.com.hk` to the Tailscale funnel host **`vps.tailb5775.ts.net`** (plus `clinic.com.hk`). `bash certs/generate.sh` now validates that the SAN includes `vps.tailb5775.ts.net` and `clinic.com.hk`.
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -196,3 +196,26 @@
 .text-theme-foreground {
   color: var(--foreground);
 }
+/* AI chat markdown tables */
+.md-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+.md-table th,
+.md-table td {
+  border: 1px solid hsl(var(--border));
+  padding: 4px 8px;
+  text-align: left;
+}
+.md-table th {
+  background: hsl(var(--muted));
+  font-weight: 600;
+}
+.md-content {
+  overflow-x: auto;
+}
+.ai-line {
+  white-space: pre-wrap;
+}

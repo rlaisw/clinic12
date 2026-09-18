@@ -10,6 +10,9 @@ from api.rag.query_classifier import classify_query, INTENT_PATIENT_HISTORY, INT
 from api.rag.context_manager import get_or_create_session, append_query, cleanup_expired_sessions
 from api.rag.hybrid_router import hybrid_search, _live_queue_data
 from datetime import date
+from unittest.mock import patch
+from django.test.utils import override_settings
+import tempfile
 
 User = get_user_model()
 
@@ -117,3 +120,26 @@ class WaitingQueueEndpointTests(TestCase):
         self.assertIn("total_waiting", resp.data)
         self.assertIn("patients", resp.data)
         self.assertEqual(resp.data["total_waiting"], 1)
+
+
+class AutoIndexSignalTests(TestCase):
+    """post_save/post_delete signals upsert/remove LanceDB rows."""
+
+    @override_settings(LANCEDB_URI=tempfile.mkdtemp())
+    @patch("api.rag.indexer.embed_text", return_value=[0.1] * 384)
+    def test_save_upserts_delete_removes(self, _mock):
+        from api.rag.indexer import _table, _SOURCES
+        self.assertIn("api_patient", _SOURCES)
+
+        p = Patient.objects.create(first_name="Signal", last_name="Test", hkid="S123456(7)", date_of_birth=date(2000, 1, 1))
+        rows = _table().search().limit(10).to_list()
+        self.assertEqual(len(rows), 1)
+
+        p.first_name = "Signal2"
+        p.save()
+        rows = _table().search().limit(10).to_list()
+        self.assertEqual(len(rows), 1, "update must upsert, not duplicate")
+
+        p.delete()
+        rows = _table().search().limit(10).to_list()
+        self.assertEqual(len(rows), 0, "delete must remove the row")

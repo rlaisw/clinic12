@@ -61,10 +61,13 @@ Health check.
 | Field | Value |
 |-------|-------|
 | Name | Clinic RAG Query |
-| API Endpoint | http://172.28.51.11:8001/query |
+| API Endpoint | https://vps.tailb5775.ts.net:8000/api/rag/query |
 | Method | POST |
-| Headers | Content-Type: application/json |
+| Headers | Authorization: Token <app token>, Content-Type: application/json |
+
+> Both `/api/rag/query` and `/api/sql/` require a DRF token header.
+> Missing/invalid → `401 {"detail":"Invalid token."}`. See `rag/dify_setup.md`.
 
 ## Data Exfiltration Rules
 - RAG API returns only text content (no PHI beyond what's in the source tables)
-- Query endpoint is internal (Dify server → RAG API, not public)
+- Endpoints are token-protected — the Dify HTTP node carries `Authorization: Token ...`

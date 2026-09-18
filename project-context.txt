@@ -1,3 +1,7 @@
+### PROJECT ###
+Expired: Medication & Patient Management System (Next.js 16 + Django 6 / SQLite)
+Working dir: /home/ubuntu/kilocode/clinic12
+
 ### PACKAGE.JSON ###
 {
   "name": "with-tailwind",
@@ -5,6 +9,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:https": "bash certs/generate.sh && pnpm --filter web dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
@@ -15,27 +20,25 @@
     "turbo": "^2.9.16"
   },
   "packageManager": "pnpm@10.19.0",
-  "engines": {
-    "node": ">=18"
-  }
+  "engines": { "node": ">=18" },
+  "dependencies": { "recharts": "^3.8.1" }
 }
 
 ### FOLDER STRUCTURE (Top 2 Levels) ###
 ├── README.md
+├── TECH_STACK.md
+├── DEPLOYMENT_CHECKLIST.md
+├── certs/            # self-signed certs + generate.sh
+├── .github/workflows/ # ci.yml, deploy.yml
 ├── apps
 │   ├── docs
-│   └── web
+│   └── web           # Next.js at apps/web, HTTPS server.js
 ├── backend
 │   ├── api
 │   ├── config
 │   ├── db.sqlite3
 │   ├── manage.py
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── postcss.config.js
 │   ├── requirements.txt
-│   ├── static
-│   ├── tailwind.config.js
 │   └── venv
 ├── package.json
 ├── packages
@@ -45,54 +48,66 @@
 │   └── ui
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
-└── turbo.json
+├── turbo.json
+└── .cocoindex_code/  # ccc (cocoindex-code) project index
 
 ### NEXT CONFIG ###
+apps/web/next.config.ts:
+- allowedDevOrigins includes localhost, vps.tailb5775.ts.net (+ port variants)
+- rewrites /api/:path* -> https://vps.tailb5775.ts.net:8000/api/:path*
+- rewrites /chat/:path* -> https://10.0.1.75/chat/:path*
 
-### TSCONFIG.JSON ###
+### HTTPS / PORTS ###
+- Frontend :3001 HTTPS (server.js uses certs/clinic.com.hk.{crt,key}) — also the origin proxy
+- Backend  :8000 HTTPS (runserver_plus --cert/--key)
+- Dify     :80/443 via nginx pinned to 10.0.1.75 (private IP)
+- Tailscale Funnel : https://vps.tailb5775.ts.net -> https+insecure://127.0.0.1:3001
+
+### ORIGIN PROXY (apps/web/server.js) ###
+- /api/*            -> Django 127.0.0.1:8000
+- /dify/* (strip)   -> Dify 10.0.1.75:80
+- /chat/* (rewrite) -> Dify 10.0.1.75:80 (HTML: /_next/ -> /dify/_next/, ws://localhost -> /socket.io/)
+- /socket.io/*      -> Dify 10.0.1.75:80 (polling HTTP + raw websocket upgrade)
+- /assets/ /static/ /fonts/ /images/ -> Dify 10.0.1.75:80
+- Dify blocking chat timeout: 420 s
+
+### SERVICES ###
+- Start all (fg|background|stop|restart|status): bash start-all.sh
+- Foreground only: bash start-dev.sh
+- Funnel: tailscale funnel --bg https+insecure://127.0.0.1:3001
+- Stop funnel: tailscale funnel reset
+- Certs: bash certs/generate.sh
 
 ### DIFY & RAG CONFIGURATION ###
-**✅ RESOLVED - All Issues Fixed**
+**✅ WORKING**
+- Dify web UI: https://vps.tailb5775.ts.net/dify/ (via server.js proxy, :3001)
+- Hosted chat: https://vps.tailb5775.ts.net/chat/45322G8rzGMEW7WP (via proxy)
+- In-app AI chatbot: /doctor/patients/{id}/ai-chatbot -> DifyChat (direct API /dify/api/chat-messages, passport from /dify/api/passport)
+- RAG API: https://vps.tailb5775.ts.net:8000/api/rag/query (token-protected)
+- Vector store: LanceDB (backend/lancedb/), populated by rag/cocoindex_pipeline.py
+- Auth: Django Token Authentication
+- SSRF proxy: SSRF_PROXY_HTTP_URL/HTTPS_URL=http://ssrf_proxy:3128
+- Sandbox proxy: SANDBOX_HTTP_PROXY/HTTPS_PROXY=http://ssrf_proxy:3128
 
-**Original Problem:** Dify HTTP Request node failing with 403 Forbidden and connection timeout to RAG API.
+### CI/CD ###
+- .github/workflows/ci.yml — lint, type-check, backend tests, Django check --deploy, bandit (Node 22 + Py 3.12)
+- .github/workflows/deploy.yml — build + collectstatic (deploy placeholder)
 
-**Root Cause & Fixes Applied:**
-1. **URL Migration** - Changed from `https://kilo.tail10ee0.ts.net` to `https://kilo.clinic.com.hk` (removed Tailscale dependency, using self-signed SSL certificate)
-2. **SSRF Proxy Enabled** - Set `SSRF_PROXY_HTTP_URL=http://ssrf_proxy:3128` and `SSRF_PROXY_HTTPS_URL=http://ssrf_proxy:3128`
-3. **IP Allowlist Configured** - `SSRF_PROXY_ALLOW_PRIVATE_IPS=100.0.0.0/8,10.161.92.142` for Tailscale range and Dify server
-4. **Sandbox Proxy Enabled** - `SANDBOX_HTTP_PROXY=http://ssrf_proxy:3128` and `SANDBOX_HTTPS_PROXY=http://ssrf_proxy:3128`
+### CODE SEARCH INDEX ###
+- cocoindex-code: `ccc index` / `ccc search <query>` (project DB .cocoindex_code/target_sqlite.db, ~356 files)
+- codebase-memory: graph index (~3.8k nodes / ~9.4k edges), auto-refresh
 
-**Working Configuration:**
-- **RAG API Endpoint:** `https://kilo.clinic.com.hk:8000/api/rag/query`
-- **Token:** `302b3a7bf0ddf403522ec09e642bb95494da5e52`
-- **Method:** GET (schema discovery) / POST (query)
-- **Headers:** 
-  - `Authorization: Token 302b3a7bf0ddf403522ec09e642bb95494da5e52`
-  - `Content-Type: application/json`
-- **Body:** JSON format with `query` and `top_k` parameters
-- **SSL:** Self-signed certificate at kilo.clinic.com.hk
-- **CORS:** Configured to allow kilo.clinic.com.hk
+### ENVIRONMENT SETTINGS ###
+- backend/.env: DEBUG, SECRET_KEY, DATABASE_URL, HF_TOKEN
+- apps/web/.env: NEXT_PUBLIC_API_URL=/api
+- CORS: backend/config/settings.py allowed origins include vps.tailb5775.ts.net + dev IPs
 
-**Status:** ✅ Working - Successfully fetches patient data from RAG API
-
-### RECEIPT FEATURE ###
-**✅ IMPLEMENTED & WORKING**
-- Receipt page fixed: `apps/web/app/(dashboard)/doctor/patients/[id]/receipt/page.tsx` now renders `<ReceiptTabs patientId={id} />`
-- Tab integration complete in layout.tsx
-- Receipt generation and QR code verification functional
-
-### CURRENT ENVIRONMENT SETTINGS ###
-- Working Directory: `C:\kilocode\clinic11`
-- Current Date/Time: 2026-08-21T13:13:26+08:00
-- Backend Configuration: `backend/config/settings.py` line 92-94
-- CORS settings include Tailscale domains in CSRF_TRUSTED_ORIGINS and CORS_ALLOWED_ORIGINS
-- Tailscale funnel running: 
-  - `https://kilo.clinic.com.hk/` → `http://localhost:3001` (Frontend)
-  - `https://kilo.clinic.com.hk:8000/` → `http://127.0.0.1:8000` (Backend API)
-- Tailscale IP: `100.90.231.24`
-
-### KEY FILES MODIFIED ###
-- `apps/web/app/(dashboard)/doctor/patients/[id]/receipt/page.tsx` - Fixed to render ReceiptTabs
-- `backend/config/settings.py` - SSRF proxy, Dify, and CORS settings
-- `.env` (Dify server) - SSRF proxy and sandbox proxy configuration
-- `project-context.txt` - This file (updated with resolution details)
+### KEY FILES MODIFIED (this session) ###
+- apps/web/server.js                 — HTTPS on :3001 + Dify origin proxy (/dify, /chat, /socket.io, assets)
+- apps/web/components/doctor/dify-chat.tsx — direct-API Dify chat client (passport, chat-messages, safe table rendering, Shift+Enter = newline)
+- apps/web/app/(dashboard)/doctor/patients/[id]/layout.tsx — AI Chatbot tab renders DifyChat
+- apps/web/next.config.ts            — allowedDevOrigins for funnel host
+- start-all.sh / start-dev.sh        — lifecycle (fg/bg/stop/restart/status), pre-warm, funnel-last
+- .github/workflows/ci.yml           — Node 22, max-warnings 999
+- README.md, TECH_STACK.md, DEPLOYMENT_CHECKLIST.md, USER_GUIDE.md — refreshed
+- certs/ regenerate with vps.tailb5775.ts.net + clinic.com.hk SANs

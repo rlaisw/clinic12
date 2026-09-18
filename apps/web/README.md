@@ -1,28 +1,36 @@
-## Getting Started
+# Clinic12 Web (Next.js frontend)
 
-First, run the development server:
+Frontend for the Clinic12 medication & patient management system. React 19 + Next.js 16 + Tailwind CSS, served over HTTPS by `server.js` on port **3001**.
+
+## Running
+
+From the repository root, start both backend and frontend with:
 
 ```bash
-yarn dev
+bash start-all.sh fg        # backend :8000 + frontend :3001, Tailscale funnel auto-start
+bash start-all.sh status    # check service health
 ```
 
-Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
+Or run the frontend directly:
 
-You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+node server.js              # HTTPS on :3001 (requires certs/ generated first)
+```
 
-To create [API routes](https://nextjs.org/docs/app/building-your-application/routing/router-handlers) add an `api/` directory to the `app/` directory with a `route.ts` file. For individual endpoints, create a subfolder in the `api` directory, like `api/hello/route.ts` would map to [http://localhost:3001/api/hello](http://localhost:3001/api/hello).
+## URLs
 
-## Learn More
+- App: `https://vps.tailb5775.ts.net/` (public, via Tailscale funnel) or `https://localhost:3001`
+- Backend proxy: `/api/*` → Django `:8000`
+- Dify proxy: `/dify/*`, `/chat/*`, `/socket.io/*` → `10.0.1.75:80`
 
-To learn more about Next.js, take a look at the following resources:
+## Development layout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn/foundations/about-nextjs) - an interactive Next.js tutorial.
+- `app/` — Next.js App Router pages (dashboard, patients, medications, queue)
+- `components/doctor/` — feature components incl. `dify-chat.tsx` (direct-API Dify client)
+- `components/ui/` — shadcn-style UI primitives (button, card, input, textarea, ...)
+- `server.js` — HTTPS origin + reverse proxy to Django and Dify
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_source=github.com&utm_medium=referral&utm_campaign=turborepo-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- `next.config.ts` `allowedDevOrigins` must include `vps.tailb5775.ts.net` for dev HMR through the funnel.
+- Dify blocking chat requests can take minutes (large table answers) — the proxy timeout is 420 s.

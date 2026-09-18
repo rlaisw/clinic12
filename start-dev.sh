@@ -93,9 +93,9 @@ if [ -d "$FRONTEND_DIR/.next/dev" ]; then
 fi
 
 # --- Start Backend ---
-log_info "Starting Django Backend on https://kilo.clinic.com.hk:8000 ..."
+log_info "Starting Django Backend on https://vps.tailb5775.ts.net:8000 ..."
 cd "$BACKEND_DIR"
-export FRONTEND_BASE_URL="https://kilo.clinic.com.hk"
+export FRONTEND_BASE_URL="https://vps.tailb5775.ts.net"
 export DJANGO_SETTINGS_MODULE="config.settings"
 
 CERT_FILE="$BASE_PATH/certs/clinic.com.hk.crt"
@@ -120,22 +120,22 @@ BACKEND_PID=$!
 
 sleep 3
 
-if curl -k -s -f https://kilo.clinic.com.hk:8000/ >/dev/null 2>&1; then
-    log_ok "Backend is running at https://kilo.clinic.com.hk:8000"
+if curl -k -s -f https://vps.tailb5775.ts.net:8000/ >/dev/null 2>&1; then
+    log_ok "Backend is running at https://vps.tailb5775.ts.net:8000"
 else
     log_warn "Backend may still be starting..."
 fi
 
 # --- Start Frontend ---
-log_info "Starting Next.js Frontend on https://kilo.clinic.com.hk:3001 ..."
+log_info "Starting Next.js Frontend on https://vps.tailb5775.ts.net:3001 ..."
 cd "$FRONTEND_DIR"
-pnpm dev &
+node server.js &
 FRONTEND_PID=$!
 
 sleep 5
 
-if curl -k -s -f https://kilo.clinic.com.hk:3001/login >/dev/null 2>&1; then
-    log_ok "Frontend is running at https://kilo.clinic.com.hk:3001"
+if curl -k -s -f https://vps.tailb5775.ts.net:3001/login >/dev/null 2>&1; then
+    log_ok "Frontend is running at https://vps.tailb5775.ts.net:3001"
 else
     log_warn "Frontend may still be starting..."
 fi
@@ -144,19 +144,24 @@ echo ""
 echo "========================================"
 echo "  BOTH SERVICES STARTED!"
 echo "========================================"
-echo "  Frontend: https://kilo.clinic.com.hk:3001"
-echo "  Backend:  https://kilo.clinic.com.hk:8000"
-echo "  Admin:    https://kilo.clinic.com.hk:8000/admin/"
-echo "  API:      https://kilo.clinic.com.hk:8000/api/token/"
+echo "  Frontend: https://vps.tailb5775.ts.net:3001"
+echo "  Backend:  https://vps.tailb5775.ts.net:8000"
+echo "  Admin:    https://vps.tailb5775.ts.net:8000/admin/"
+echo "  API:      https://vps.tailb5775.ts.net:8000/api/token/"
 echo ""
 echo "Press [Ctrl+C] to stop both services."
 echo ""
 
 cleanup() {
+    # Disable the trap so a second Ctrl+C doesn't interrupt cleanup.
+    trap - INT TERM
     echo ""
     log_info "Shutting down services..."
-    kill $BACKEND_PID 2>/dev/null
-    kill $FRONTEND_PID 2>/dev/null
+    kill "$BACKEND_PID" 2>/dev/null
+    kill "$FRONTEND_PID" 2>/dev/null
+    # Wait non-fatally so children killed by the propagated signal
+    # don't leak a nonzero status out of this script.
+    wait "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
     log_ok "All services stopped."
     exit 0
 }

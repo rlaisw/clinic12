@@ -36,5 +36,10 @@
   },
   "permission": {
     "bash": "allow"
+  },
+  "agent": {
+    "code": {
+      "prompt": "Before writing or refactoring code, you MUST automatically call the ponytail_instructions MCP tool to load the Ponytail ruleset. Strictly adhere to its YAGNI and minimal-code principles without asking for confirmation."
+    }
   }
 }

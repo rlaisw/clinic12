@@ -6,7 +6,7 @@ distinguished_name = dn
 x509_extensions = v3_req
 
 [dn]
-CN = kilo.clinic.com.hk
+CN = vps.tailb5775.ts.net
 O = Clinic Local Dev
 L = Hong Kong
 C = HK
@@ -15,5 +15,5 @@ C = HK
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = kilo.clinic.com.hk
+DNS.1 = vps.tailb5775.ts.net
 DNS.2 = clinic.com.hk
