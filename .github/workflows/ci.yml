@@ -62,9 +62,8 @@ jobs:
     - name: Run linting (Backend)
       run: |
         cd backend
+        pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Additional linting if available
-        # pylint **/*.py || echo "pylint failed or not configured"
         
     - name: Run basic Django checks
       run: |
