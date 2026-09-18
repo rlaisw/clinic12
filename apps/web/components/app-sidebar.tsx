@@ -26,6 +26,7 @@ import {
   UsersIcon,
   ListOrderedIcon,
   UserIcon,
+  BotIcon,
 } from "lucide-react";
 
 const data = {
@@ -74,6 +75,12 @@ const data = {
         { title: "All Patients", url: "/patients" },
         { title: "Add Patient", url: "/patients?openCreateModal=true" },
       ],
+    },
+    {
+      title: "AI Chatbot",
+      url: "/ai-chatbot",
+      icon: <BotIcon />,
+      items: [],
     },
     {
       title: "Settings",
