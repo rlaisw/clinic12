@@ -6,6 +6,7 @@ Provides GDPR-compliant audit trails for all data access and modifications
 import json
 import time
 import hashlib
+from enum import Enum
 from datetime import datetime, timezone as tz_info
 from typing import Dict, Any, Optional, List, Union
 from dataclasses import dataclass, field
