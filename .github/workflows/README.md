@@ -6,7 +6,8 @@ Runs on every push and pull request to `main` or `develop`.
 
 **Job — lint-and-test** (Node 22.x + Python 3.12):
 - Sets up Node.js (v22) and Python (3.12), caches pnpm store
-- Installs dependencies: `npm install -g pnpm@10.19.0`, `pnpm install --frozen-lockfile`, `pip install -r backend/requirements.txt`
+- Installs pnpm first (`npm install -g pnpm@10.19.0`), **before** `actions/setup-node@v4` so the `cache: pnpm` step can locate it
+- Installs dependencies: `pnpm install --frozen-lockfile`, `pip install -r backend/requirements.txt`
 - Frontend lint (errors only; warnings allowed — 58 pre-existing): `pnpm --filter @repo/ui exec eslint src --max-warnings 999`, `pnpm --filter web exec eslint --max-warnings 999`
 - Frontend type check: `pnpm --filter web run check-types` (`next typegen && tsc --noEmit`)
 - Backend tests: `python -m pytest medication/tests.py api/tests.py api/rag/tests.py`
