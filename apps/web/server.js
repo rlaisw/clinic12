@@ -1,6 +1,5 @@
 import { createServer } from 'https';
 import { request } from 'https';
-import { parse } from 'url';
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -201,7 +200,10 @@ app.prepare().then(() => {
     }
     // Anything else (including /_next/ and /favicon.ico) hits this app's own
     // Next.js dev server, so our app's chunks are never routed to Dify.
-    const parsedUrl = parse(req.url, true);
+    // WHATWG URL: legacy url.parse() is deprecated (DEP0169) and its
+    // non-standard behavior is no longer CVE-patched by Node.
+    const parsedUrl = new URL(req.url, 'http://localhost');
+    parsedUrl.query = Object.fromEntries(parsedUrl.searchParams);
     handle(req, res, parsedUrl);
   });
 
