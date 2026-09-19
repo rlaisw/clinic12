@@ -1,3 +1,21 @@
+# ============================================================================
+# Clinic Chatbot v1 — Dify advanced-chat workflow DSL (annotated copy)
+#
+# CHANGED vs. the live export (this is the ONLY node whose behavior changed):
+#   Node "LLM 2" (id 1787445502471) — SQL generator system prompt:
+#     + added steering to `api_medication_history` (combined VIEW of active /
+#       past / prescription medications) for ANY medication-history question
+#     + added steering to `api_medicalhistory` for condition / diagnosis history
+#     + demoted `api_activemedication` to "currently taking right now" only
+#     + added rule: end SQL with ';' and never append prose after it
+#       (fixes the "near \"But\": syntax error" failure mode)
+#   Node "LLM 2" memory / Node "LLM" memory — query_prompt_template:
+#     normalized the quoted scalar so the file is valid YAML (value unchanged)
+#
+# UNCHANGED: everything else — all node IDs, edges, HTTP nodes, auth headers,
+# URLs, retry settings, the final answer LLM prompt, Current Time tool, viewport.
+# Import this file into Dify Studio → republish to activate the fix.
+# ============================================================================
 app:
   description: ''
   icon: 💬
@@ -144,6 +162,7 @@ workflow:
       type: custom
       zIndex: 0
     nodes:
+    # NODE: User Input (start) — UNCHANGED
     - data:
         desc: Capture user's chat messages and files.
         selected: false
@@ -164,6 +183,7 @@ workflow:
       type: custom
       width: 242
       zIndex: 0
+    # NODE: SQL executor (POST /api/sql/) — UNCHANGED
     - data:
         authorization:
           config: null
@@ -218,6 +238,7 @@ workflow:
       type: custom
       width: 242
       zIndex: 0
+    # NODE: fetch sql schema (GET /api/sql/schema) — UNCHANGED
     - data:
         authorization:
           config: null
@@ -258,6 +279,11 @@ workflow:
       type: custom
       width: 242
       zIndex: 0
+    # ------------------------------------------------------------------------
+    # NODE: LLM 2 — SQL generator (id 1787445502471)
+    # CHANGED: prompt steering fixed so medication-history questions return the
+    # complete list (was: api_activemedication only → returned 1 of 6 meds).
+    # ------------------------------------------------------------------------
     - data:
         context:
           enabled: true
@@ -265,6 +291,7 @@ workflow:
           - '1787444191352'
           - body
         memory:
+          # CHANGED: query_prompt_template quote normalized (valid YAML; value unchanged)
           query_prompt_template: '{{#sys.query#}}
 
             {{#sys.files#}}'
@@ -283,6 +310,11 @@ workflow:
         prompt_template:
         - id: llm2-prompt
           role: system
+          # CHANGED — added rules (bold additions vs. original prompt):
+          #   • api_medication_history VIEW for medication-history questions
+          #   • api_medicalhistory for condition history
+          #   • api_activemedication demoted to "currently taking right now"
+          #   • trailing-semicolon rule (no prose after SQL)
           text: 'You are a SQL generator for a clinic management system. Convert the
             user''s question into ONE SQLite SELECT statement using ONLY tables and
             columns present in the schema below.
@@ -347,6 +379,7 @@ workflow:
       type: custom
       width: 242
       zIndex: 0
+    # NODE: Answer — UNCHANGED
     - data:
         answer: '{{#llm.text#}}'
         desc: Generate response for the user and continue the conversation.
@@ -368,6 +401,7 @@ workflow:
       type: custom
       width: 242
       zIndex: 0
+    # NODE: LLM — final answer formatter (id llm) — UNCHANGED (except memory quoting)
     - data:
         context:
           enabled: true
@@ -377,6 +411,7 @@ workflow:
         desc: Take the user's input, check the conversation history, and generate
           a response.
         memory:
+          # CHANGED: query_prompt_template quote normalized (valid YAML; value unchanged)
           query_prompt_template: '{{#sys.query#}}
 
             {{#sys.files#}}'
@@ -439,6 +474,7 @@ workflow:
       type: custom
       width: 242
       zIndex: 0
+    # NODE: Current Time tool (builtin) — UNCHANGED
     - data:
         is_team_authorization: true
         paramSchemas:
