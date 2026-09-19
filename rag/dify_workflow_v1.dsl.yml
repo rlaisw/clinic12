@@ -1,0 +1,666 @@
+app:
+  description: ''
+  icon: 💬
+  icon_background: '#FEF7C3'
+  icon_type: emoji
+  mode: advanced-chat
+  name: Clinic Chatbot v1
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openrouter:0.1.8@13653d0509f2422439e54f359149d5948345b8096839d38c41ceaa21e8bec7ab
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: Hi! How can I help you today?
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      selected: false
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1787444191352-source-1787445502471-target
+      selected: false
+      source: '1787444191352'
+      sourceHandle: source
+      target: '1787445502471'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: http-request
+      id: 1787445502471-source-1786880510724-target
+      selected: false
+      source: '1787445502471'
+      sourceHandle: source
+      target: '1786880510724'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1786880510724-source-llm-target
+      selected: false
+      source: '1786880510724'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: tool
+        targetType: http-request
+      id: 1789782167014-source-1787444191352-target
+      selected: false
+      source: '1789782167014'
+      sourceHandle: source
+      target: '1787444191352'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: tool
+      id: 1776072202913-source-1789782167014-target
+      source: '1776072202913'
+      sourceHandle: source
+      target: '1789782167014'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: Capture user's chat messages and files.
+        selected: false
+        title: User Input
+        type: start
+        variables: []
+      height: 117
+      id: '1776072202913'
+      position:
+        x: -321.26223931877746
+        y: -328.2581793117021
+      positionAbsolute:
+        x: -321.26223931877746
+        y: -328.2581793117021
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-99
+            key: ''
+            type: text
+            value: '{
+
+              "sql": "{{#1787445502471.text#}}"
+
+              }
+
+
+
+              '
+          type: json
+        default_value: null
+        error_strategy: null
+        headers: 'Authorization:Token 54a8fa6b6fbe82b3c54a9755563a58e80642cad9
+
+          Content-Type:application/json'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        ssl_verify: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: RAG API - HTTP Request
+        type: http-request
+        url: https://vps.tailb5775.ts.net:8000/api/sql/
+        variables: []
+      height: 108
+      id: '1786880510724'
+      position:
+        x: 13.590084736876406
+        y: -94.96744545233841
+      positionAbsolute:
+        x: 13.590084736876406
+        y: -94.96744545233841
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        headers: 'Authorization:Token 54a8fa6b6fbe82b3c54a9755563a58e80642cad9
+
+          Content-Type:application/json'
+        method: get
+        params: ''
+        retry_config:
+          max_retries: 10
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: fetch sql schema
+        type: http-request
+        url: https://vps.tailb5775.ts.net:8000/api/sql/schema
+        variables: []
+      height: 137
+      id: '1787444191352'
+      position:
+        x: 245.18758304485004
+        y: -307.2581793117021
+      positionAbsolute:
+        x: 245.18758304485004
+        y: -307.2581793117021
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1787444191352'
+          - body
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 100
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek/deepseek-v4-flash-0731
+          provider: langgenius/openrouter/openrouter
+        prompt_template:
+        - id: llm2-prompt
+          role: system
+          text: 'You are a SQL generator for a clinic management system. Convert the
+            user''s question into ONE SQLite SELECT statement using ONLY tables and
+            columns present in the schema below.
+
+            Today is {{#1789782167014.text#}}
+
+            {{#context#}}
+
+            Database schema:
+
+            {{#1787444191352.body#}}
+
+
+            Rules:
+
+            - Patients are stored in `api_patient`.
+
+            - `api_medication_history` is a combined VIEW of ALL medications (active,
+            past, prescription) with columns (category, medication_name, dosage, route,
+            frequency, days_supply, start_date, diagnostic_result). USE IT for ANY
+            ''what medications did / took / is taking'' or medication-history question.
+            Join with api_patient on patient_id and filter start_date for time ranges
+            (e.g. start_date >= date(''now'', ''-6 months'')).
+
+            - `api_medicalhistory` stores patient conditions/diagnoses (condition,
+            diagnosis_date, notes). Use it for ''medical history / conditions / diagnosis
+            history'' questions.
+
+            - `api_activemedication` holds current prescriptions — use it ONLY for
+            ''currently taking right now'' questions.
+
+            - Allergies in `api_allergy`; medications catalog in `medication_medication`.
+
+            - Use COUNT(*) for counts, never COUNT().
+
+            - END the SQL statement with a semicolon (;). Never append explanations,
+            ''But'', ''First'', or any other text after the semicolon — put commentary
+            BEFORE the SQL, never after it.
+
+            - Reply with ONLY the executable SQL statement. No explanations, no reasoning,
+            no markdown fences, no tool-call wrappers such as [sql(...)] or <|...|>
+            tags.
+
+            - Select ONLY the columns the question actually needs (e.g., name + category
+            for a categorized list). NEVER use SELECT *. Compact results avoid truncation.'
+        selected: false
+        title: LLM 2
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1787445502471'
+      position:
+        x: -326.0150169424946
+        y: -94.96744545233841
+      positionAbsolute:
+        x: -326.0150169424946
+        y: -94.96744545233841
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        answer: '{{#llm.text#}}'
+        desc: Generate response for the user and continue the conversation.
+        selected: false
+        title: Answer
+        type: answer
+        variables: []
+      height: 147
+      id: answer
+      position:
+        x: 662.4190096013751
+        y: -101.3044822839612
+      positionAbsolute:
+        x: 662.4190096013751
+        y: -101.3044822839612
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1786880510724'
+          - body
+        desc: Take the user's input, check the conversation history, and generate
+          a response.
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 100
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek/deepseek-v4-flash-0731
+          provider: langgenius/openrouter/openrouter
+        prompt_template:
+        - id: final-answer-prompt
+          role: system
+          text: 'You are a clinic assistant. A SQL tool returned the following result
+            for the user''s question:
+
+
+            {{#1786880510724.body#}}
+
+
+            Answer the user directly using ONLY that result. Be concise (one sentence
+            for counts/aggregates; table format when listing multiple rows). Never
+            include your reasoning, never repeat raw JSON or error text.
+
+
+            Reply with ONLY the final answer for the user. Do NOT output "thinking",
+            reasoning, or any preamble.
+
+
+            FORMAT RULE: when the result has 2+ rows, ALWAYS output a GFM markdown
+            table using pipe separators, e.g.
+
+            | Category | Medication |
+
+            |---|---|
+
+            | A | B |
+
+            Never output raw HTML (<table> tags) and never output tab-separated text.'
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 148
+      id: llm
+      position:
+        x: 340.44647732646956
+        y: -94.96744545233841
+      positionAbsolute:
+        x: 340.44647732646956
+        y: -94.96744545233841
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: '%Y-%m-%d %H:%M:%S'
+          form: form
+          human_description:
+            en_US: Time format in strftime standard.
+            ja_JP: Time format in strftime standard.
+            pt_BR: Time format in strftime standard.
+            zh_Hans: strftime 标准的时间格式。
+          input_schema: null
+          label:
+            en_US: Format
+            ja_JP: Format
+            pt_BR: Format
+            zh_Hans: 格式
+          llm_description: null
+          max: null
+          min: null
+          multiple: false
+          name: format
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: UTC
+          form: form
+          human_description:
+            en_US: Timezone
+            ja_JP: Timezone
+            pt_BR: Timezone
+            zh_Hans: 时区
+          input_schema: null
+          label:
+            en_US: Timezone
+            ja_JP: Timezone
+            pt_BR: Timezone
+            zh_Hans: 时区
+          llm_description: null
+          max: null
+          min: null
+          multiple: false
+          name: timezone
+          options:
+          - icon: null
+            label:
+              en_US: UTC
+              ja_JP: UTC
+              pt_BR: UTC
+              zh_Hans: UTC
+            value: UTC
+          - icon: null
+            label:
+              en_US: America/New_York
+              ja_JP: America/New_York
+              pt_BR: America/New_York
+              zh_Hans: 美洲/纽约
+            value: America/New_York
+          - icon: null
+            label:
+              en_US: America/Los_Angeles
+              ja_JP: America/Los_Angeles
+              pt_BR: America/Los_Angeles
+              zh_Hans: 美洲/洛杉矶
+            value: America/Los_Angeles
+          - icon: null
+            label:
+              en_US: America/Chicago
+              ja_JP: America/Chicago
+              pt_BR: America/Chicago
+              zh_Hans: 美洲/芝加哥
+            value: America/Chicago
+          - icon: null
+            label:
+              en_US: America/Sao_Paulo
+              ja_JP: America/Sao_Paulo
+              pt_BR: América/São Paulo
+              zh_Hans: 美洲/圣保罗
+            value: America/Sao_Paulo
+          - icon: null
+            label:
+              en_US: Asia/Shanghai
+              ja_JP: Asia/Shanghai
+              pt_BR: Asia/Shanghai
+              zh_Hans: 亚洲/上海
+            value: Asia/Shanghai
+          - icon: null
+            label:
+              en_US: Asia/Ho_Chi_Minh
+              ja_JP: Asia/Ho_Chi_Minh
+              pt_BR: Ásia/Ho Chi Minh
+              zh_Hans: 亚洲/胡志明市
+            value: Asia/Ho_Chi_Minh
+          - icon: null
+            label:
+              en_US: Asia/Tokyo
+              ja_JP: Asia/Tokyo
+              pt_BR: Asia/Tokyo
+              zh_Hans: 亚洲/东京
+            value: Asia/Tokyo
+          - icon: null
+            label:
+              en_US: Asia/Dubai
+              ja_JP: Asia/Dubai
+              pt_BR: Asia/Dubai
+              zh_Hans: 亚洲/迪拜
+            value: Asia/Dubai
+          - icon: null
+            label:
+              en_US: Asia/Kolkata
+              ja_JP: Asia/Kolkata
+              pt_BR: Asia/Kolkata
+              zh_Hans: 亚洲/加尔各答
+            value: Asia/Kolkata
+          - icon: null
+            label:
+              en_US: Asia/Seoul
+              ja_JP: Asia/Seoul
+              pt_BR: Asia/Seoul
+              zh_Hans: 亚洲/首尔
+            value: Asia/Seoul
+          - icon: null
+            label:
+              en_US: Asia/Singapore
+              ja_JP: Asia/Singapore
+              pt_BR: Asia/Singapore
+              zh_Hans: 亚洲/新加坡
+            value: Asia/Singapore
+          - icon: null
+            label:
+              en_US: Europe/London
+              ja_JP: Europe/London
+              pt_BR: Europe/London
+              zh_Hans: 欧洲/伦敦
+            value: Europe/London
+          - icon: null
+            label:
+              en_US: Europe/Berlin
+              ja_JP: Europe/Berlin
+              pt_BR: Europe/Berlin
+              zh_Hans: 欧洲/柏林
+            value: Europe/Berlin
+          - icon: null
+            label:
+              en_US: Europe/Moscow
+              ja_JP: Europe/Moscow
+              pt_BR: Europe/Moscow
+              zh_Hans: 欧洲/莫斯科
+            value: Europe/Moscow
+          - icon: null
+            label:
+              en_US: Australia/Sydney
+              ja_JP: Australia/Sydney
+              pt_BR: Australia/Sydney
+              zh_Hans: 澳大利亚/悉尼
+            value: Australia/Sydney
+          - icon: null
+            label:
+              en_US: Pacific/Auckland
+              ja_JP: Pacific/Auckland
+              pt_BR: Pacific/Auckland
+              zh_Hans: 太平洋/奥克兰
+            value: Pacific/Auckland
+          - icon: null
+            label:
+              en_US: Africa/Cairo
+              ja_JP: Africa/Cairo
+              pt_BR: Africa/Cairo
+              zh_Hans: 非洲/开罗
+            value: Africa/Cairo
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: select
+        params:
+          format: ''
+          timezone: ''
+        plugin_id: null
+        plugin_unique_identifier: ''
+        provider_icon: https://kilo.clinic.com.hk/console/api/workspaces/current/tool-provider/builtin/time/icon
+        provider_id: time
+        provider_name: time
+        provider_show_name: CurrentTime
+        provider_type: builtin
+        selected: false
+        title: Current Time
+        tool_configurations:
+          format:
+            type: mixed
+            value: '%Y-%m-%d %H:%M:%S'
+          timezone:
+            type: constant
+            value: UTC
+        tool_description: A tool for getting the current time.
+        tool_label: Current Time
+        tool_name: current_time
+        tool_node_version: '2'
+        tool_parameters: {}
+        type: tool
+      height: 114
+      id: '1789782167014'
+      position:
+        x: -45.148556133305135
+        y: -307.2581793117021
+      positionAbsolute:
+        x: -45.148556133305135
+        y: -307.2581793117021
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    viewport:
+      x: 327.9982128606273
+      y: 355.5504627937225
+      zoom: 0.6312098392799896
+  rag_pipeline_variables: []
