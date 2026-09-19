@@ -21,6 +21,9 @@ Clinic12 is a full-stack medication and patient management system integrating a 
 ### 🤖 AI-Powered Features
 - Dify-powered AI Chatbot for clinical decision support
 - Retrieval-Augmented Generation (RAG) for context-aware responses
+- SQL tool with tolerance for LLM quirks (trailing-prose recovery, reasoning-preamble stripping, fenced-block extraction)
+- Combined `api_medication_history` view (active + past + prescription) so medication-history questions return complete answers
+- Auto-populated medical history: any recorded diagnosis (certificate, receipt, prescription, active medication) creates the patient's `MedicalHistory` row
 - Secure access via Tailscale tunneling
 - Role-based access controls (doctor-only)
 
@@ -58,9 +61,10 @@ One public listener on the VPS — the Tailscale funnel at `https://vps.tailb577
 3. **Dify chat client** (`apps/web/components/doctor/dify-chat.tsx`): the in-app AI Chatbot tab talks **directly to the Dify API** (`/dify/api/chat-messages`) with a webapp passport — it does **not** embed Dify's web UI in an iframe.
 4. **API Endpoints**:
    - SQL Schema API: `https://vps.tailb5775.ts.net:8000/api/sql/schema`
+   - SQL Query API: `https://vps.tailb5775.ts.net:8000/api/sql/` (read-only, LIMIT 200; recovers from malformed LLM SQL)
    - Auth: Django REST Framework with Token Authentication
    - File Generation: Receipt and certificate PDF endpoints
-5. **Database**: Relational model with foreign key relationships between patients, medications, receipts, and certificates; LanceDB holds RAG embeddings.
+5. **Database**: Relational model with foreign key relationships between patients, medications, receipts, and certificates; LanceDB holds RAG embeddings. `api_medication_history` is a SQLite view unioning the three medication tables for chatbot queries.
 
 ## Getting Started
 See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for setup instructions.

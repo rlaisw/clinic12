@@ -47,6 +47,58 @@ def make_receipt(patient):
     )
 
 
+class MedicationHistoryViewTests(TestCase):
+    """Combined view must return medications from all three tables."""
+
+    def setUp(self):
+        self.patient = Patient.objects.create(
+            first_name="Raymond",
+            last_name="Lai",
+            date_of_birth=date(1964, 5, 1),
+            gender="M",
+            phone="12345678",
+        )
+        from api.models import ActiveMedication, PastMedication, PrescriptionMedication
+        ActiveMedication.objects.create(
+            patient=self.patient, name="Dextromethorphan", dosage="450 mg",
+            route="oral", frequency="four times daily", start_date=date(2026, 9, 15),
+            diagnostic_result="Influenza",
+        )
+        PastMedication.objects.create(
+            patient=self.patient, name="Omeprazole", dosage="450 mg",
+            route="oral", frequency="twice daily", start_date=date(2026, 9, 19),
+            end_date=date(2026, 9, 24), diagnostic_result="Stomachache",
+        )
+        PrescriptionMedication.objects.create(
+            patient=self.patient, item=1, medication_name="Paracetamol 1",
+            dosage_amount=1, dosage_unit="tablets", route="oral", frequency="twice daily",
+            start_date=date(2026, 9, 18), end_date=date(2026, 9, 21), diagnostic_result="Influenza",
+        )
+
+    def test_view_unions_all_three_tables(self):
+        from django.db import connection
+        with connection.cursor() as cur:
+            cur.execute(
+                "SELECT category, medication_name FROM api_medication_history WHERE patient_id = %s "
+                "ORDER BY category, medication_name",
+                [self.patient.id],
+            )
+            rows = cur.fetchall()
+        self.assertEqual(len(rows), 3, rows)
+        self.assertIn(("active", "Dextromethorphan"), rows)
+        self.assertIn(("past", "Omeprazole"), rows)
+        self.assertIn(("prescription", "Paracetamol 1"), rows)
+
+    def test_sql_schema_exposes_combined_view_with_steer_note(self):
+        client = APIClient()
+        resp = client.get("/api/sql/schema")
+        self.assertEqual(resp.status_code, 200)
+        tables = resp.data["tables"]
+        self.assertIn("api_medication_history", tables)
+        desc = tables["api_medication_history"].get("description", "")
+        self.assertIn("COMBINED medication history", desc)
+
+
 class ReceiptPdfEndpointTests(TestCase):
     """Regression guard for the Receipt Preview 500 (missing ``fitz`` import)."""
 
@@ -77,3 +129,64 @@ class ReceiptPdfEndpointTests(TestCase):
         response = self.client.get(f"/api/receipts/{self.receipt.id}/pdf/")
         self.assertNotEqual(response.status_code, 401)
         self.assertNotEqual(response.status_code, 403)
+
+
+class SqlQueryProseToleranceTests(TestCase):
+    """Regression guard: the bot appends prose ("... But first ...") without a
+    closing ';' to generated SQL. The endpoint must recover, not 400."""
+
+    def setUp(self):
+        self.doctor = make_doctor()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.doctor)
+        self.patient = Patient.objects.create(
+            first_name="Raymond",
+            last_name="Lai",
+            date_of_birth=date(1964, 5, 1),
+            gender="M",
+            phone="12345678",
+        )
+
+    def _post_sql(self, sql):
+        return self.client.post("/api/sql/", {"sql": sql}, format="json")
+
+    def test_trailing_prose_without_semicolon_recovers(self):
+        """SQL followed by 'But ...' (no ';') must still return the query rows."""
+        sql = f"SELECT count(*) FROM api_patient But first check the row count"
+        resp = self._post_sql(sql)
+        self.assertEqual(resp.status_code, 200, resp.content[:300])
+        self.assertIn("rows", resp.data)
+        self.assertEqual(resp.data["rows"][0]["count(*)"], 1)
+
+    def test_clean_sql_unaffected(self):
+        resp = self._post_sql(f"SELECT count(*) FROM api_patient")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["rows"][0]["count(*)"], 1)
+
+    def test_helper_returns_longest_executable_prefix(self):
+        from api.views import _executable_prefix
+        import sqlite3, tempfile, os
+        # Production DB is a real sqlite file; the Django in-memory test DB
+        # isn't reachable via a bare sqlite3.connect, so mirror production.
+        with tempfile.NamedTemporaryFile(suffix=".db3", delete=False) as tf:
+            path = tf.name
+        try:
+            conn = sqlite3.connect(path)
+            conn.execute("CREATE TABLE api_patient (id INTEGER)")
+            conn.execute("INSERT INTO api_patient VALUES (1)")
+            conn.commit()
+            recovered = _executable_prefix(
+                conn,
+                "SELECT count(*) FROM api_patient But first check the row count",
+            )
+            # The scan stops at the first token SQLite can't absorb, which is
+            # exactly where the trailing prose begins. A prose word right after
+            # a table name can be absorbed as an alias — harmless for results.
+            self.assertIsNotNone(recovered)
+            cur = conn.cursor()
+            cur.execute(f"{recovered} LIMIT 200")
+            self.assertEqual(cur.fetchone()[0], 1)
+            self.assertIsNone(_executable_prefix(conn, "But not sql at all"))
+        finally:
+            conn.close()
+            os.unlink(path)

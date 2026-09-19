@@ -50,7 +50,17 @@ api_patient (1) ──┬── (N) api_sickleavecertificate
                   ├── (N) api_activemedication
                   ├── (N) api_allergy
                   └── (N) api_queueentry
+
+api_medication_history (read-only VIEW, migration api.0019) = 
+  api_activemedication UNION ALL api_pastmedication UNION ALL api_prescriptionmedication
+  (columns: patient_id, category, medication_name, dosage, route, frequency,
+   days_supply, start_date, diagnostic_result)
 ```
+
++ Diagnostic records auto-populate `api_medicalhistory`: a post-save signal
+  (`backend/api/rag/signals.py` → `record_diagnosis`) inserts a condition row
+  whenever a certificate, receipt, prescription, or active medication carries
+  a diagnosis, so chatbot "medical history" queries always have data.
 
 ## Indexing Strategy
 | Table | Concatenation Pattern | Priority |

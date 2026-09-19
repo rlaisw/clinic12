@@ -487,15 +487,27 @@ def sql_query(request):
     try:
         for sql in statements:
             try:
-                cursor = conn.cursor()
-                cursor.execute(f"{sql} LIMIT 200")
+                exec_sql = sql
+                try:
+                    cursor = conn.cursor()
+                    cursor.execute(f"{exec_sql} LIMIT 200")
+                except Exception as first_err:
+                    # LLM SQL sometimes trails explanatory prose without a
+                    # closing ';'. Fall back to the longest executable prefix.
+                    # ponytail: token-by-token prefix scan, O(n) queries worst-case;
+                    # only runs on parse failure, fine for LLM-sized statements.
+                    exec_sql = _executable_prefix(conn, sql)
+                    if exec_sql is None:
+                        raise first_err
+                    cursor = conn.cursor()
+                    cursor.execute(f"{exec_sql} LIMIT 200")
                 rows = [dict(r) for r in cursor.fetchall()]
                 try:
-                    cursor.execute(f"SELECT COUNT(*) as cnt FROM ({sql})")
+                    cursor.execute(f"SELECT COUNT(*) as cnt FROM ({exec_sql})")
                     total = cursor.fetchone()["cnt"]
                 except Exception:
                     c2 = conn.cursor()
-                    c2.execute(sql)
+                    c2.execute(exec_sql)
                     total = len(c2.fetchall())
                 return Response({
                     "total": total,
@@ -509,6 +521,28 @@ def sql_query(request):
         conn.close()
 
 
+def _executable_prefix(conn, stmt):
+    """Longest prefix of *stmt* that sqlite parses and executes.
+
+    LLM-generated SQL sometimes trails prose ("... But first check ...")
+    without a terminating semicolon. Any prefix longer than the true
+    statement still contains the offending token and fails, so the first
+    executable prefix scanning from longest to shortest is the complete
+    statement. Returns None if nothing parses.
+    """
+    tokens = stmt.split()
+    for n in range(len(tokens) - 1, 0, -1):
+        cand = " ".join(tokens[:n])
+        try:
+            cursor = conn.cursor()
+            cursor.execute(cand)
+            cursor.fetchall()
+            return cand
+        except Exception:
+            continue
+    return None
+
+
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -517,17 +551,28 @@ def sql_schema(request):
     # Root-cause guidance: the bot picked the empty api_prescriptionmedication over
     # api_activemedication because the name sounds canonical. Description steers it.
     TABLE_NOTES = {
+        "api_medication_history": (
+            "COMBINED medication history VIEW (category + medication_name + dosage + route + "
+            "frequency + days_supply + start_date + diagnostic_result), unioning active, past, "
+            "and prescription medications. USE THIS for ANY question about 'what medications a "
+            "patient took / is taking / was prescribed' or medication history. Join with "
+            "api_patient on patient_id and filter by start_date for time ranges."
+        ),
         "api_activemedication": (
             "CURRENT prescriptions (name, dosage, route, frequency, days_supply, "
-            "start_date, diagnostic_result). USE this table for 'what patients are "
-            "prescribed / taking a medication' questions."
+            "start_date, diagnostic_result). Prefer api_medication_history for medication "
+            "history questions; use this table only for 'currently taking right now' questions."
         ),
         "api_prescriptionmedication": (
             "Legacy prescription table. USUALLY EMPTY (0 rows); prefer api_activemedication for "
             "prescribed-medication questions."
         ),
         "api_patient": "Patient demographics (first_name, last_name, hkid, phone, blood_type, allergies).",
-        "api_medicalhistory": "Patient medical conditions (condition, diagnosis_date, notes).",
+        "api_medicalhistory": (
+            "Patient medical conditions (condition, diagnosis_date, notes). Auto-populated whenever "
+            "a diagnosis is recorded (certificate, receipt, prescription, active medication). "
+            "USE this table for 'medical history / conditions / diagnosis history' questions."
+        ),
         "api_allergy": "Patient allergies (substance, reaction, severity).",
         "api_sickleavecertificate": "Issued sick leave certificates.",
         "api_receipt": "Financial receipts (medications, investigations, diagnosis, totals).",
@@ -536,7 +581,8 @@ def sql_schema(request):
         "medication_medication": "Medication catalog/catalog-of-stock drugs (name, strength, stock). Not patient-specific.",
     }
     from django.db import connection
-    tables = connection.introspection.table_names()
+    # include_views: the medication-history view must be visible to the bot.
+    tables = connection.introspection.table_names(include_views=True)
     schema = {}
     for table in tables:
         if table.startswith("django_") or table.startswith("auth_") or table.startswith("authtoken_") or table == "sqlite_sequence":

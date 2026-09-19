@@ -222,10 +222,11 @@ Question: {{#sys.query#}}
 If no relevant records, say so.
 
 When you generate SQL, remember:
+- End the SQL statement with a semicolon (;). Never append explanations, "But", "First", or any other text after the semicolon — put commentary before the SQL, not after it.
 - First check each relevant table''s row_count. If the table has row_count 0, answer "none found" immediately — do NOT dump the schema.
-- api_activemedication holds CURRENT prescriptions (name, dosage, route, frequency, days_supply, start_date, diagnostic_result). Use it for ''what patients are prescribed / taking a medication'' questions.
-- api_prescriptionmedication is legacy and usually EMPTY — prefer api_activemedication.
-- Join api_activemedication with api_patient on patient_id to report patient names.'
+- api_medication_history is a COMBINED VIEW of all medications (active, past, prescription) with columns (category, medication_name, dosage, route, frequency, days_supply, start_date, diagnostic_result). USE THIS for any ''what medications did / took / is taking'' or medication history question — never query the individual medication tables for history.
+- Join api_medication_history with api_patient on patient_id to report patient names; filter by start_date for time ranges (e.g. start_date >= date(''now'', ''-6 months'')).
+- api_medicalhistory holds patient conditions/diagnoses (condition, diagnosis_date, notes). Use it for ''medical history / conditions / diagnosis history'' questions. It is auto-populated from certificates, receipts, and medication diagnostic results.'
         - role: user
           text: '{{#sys.query#}}'
         selected: false

@@ -87,7 +87,9 @@ The **AI Chatbot** tab opens the Dify-powered assistant inside the patient dashb
 
 - Type in the 4-row text box and press **Enter** to send.
 - Press **Shift+Enter** to insert a new line without sending.
-- Example questions: *"List all medications for this patient"*, *"Show recent prescriptions"*.
+- Example questions: *"List all medications for this patient"*, *"Show recent prescriptions"*, *"Show me the medical history of Raymond Lai"*, *"Tell me what medications Raymond Lai took in the last 6 months"*.
+
+Medication-history answers combine all three sources (active, past, and prescription medications) into one list, and medical-history answers draw on diagnoses automatically recorded from certificates, receipts, and prescriptions.
 
 If the service is slow (large table answers can legitimately take a minute or two), please wait for the reply instead of resending.
 

@@ -143,3 +143,51 @@ class AutoIndexSignalTests(TestCase):
         p.delete()
         rows = _table().search().limit(10).to_list()
         self.assertEqual(len(rows), 0, "delete must remove the row")
+
+
+class DiagnosisPersistenceSignalTests(TestCase):
+    """Recording a diagnosis anywhere also creates the MedicalHistory row the chatbot reads."""
+
+    def setUp(self):
+        # Patch indexing so these tests only exercise the MedicalHistory signal.
+        patcher = patch("api.rag.indexer.embed_text", return_value=None)
+        self._idx_patch = patcher
+        self._idx_patch.start()
+        self.addCleanup(self._idx_patch.stop)
+
+    def _patient(self, hkid):
+        return Patient.objects.create(first_name="Diag", last_name="Test", hkid=hkid, date_of_birth=date(1990, 1, 1))
+
+    def test_active_medication_diagnosis_creates_history(self):
+        from api.models import ActiveMedication, MedicalHistory
+        p = self._patient("D123456(7)")
+        ActiveMedication.objects.create(
+            patient=p, name="Dextromethorphan", dosage="450 mg/day",
+            route="oral", frequency="four times daily", start_date=date(2026, 9, 15),
+            diagnostic_result="Influenza",
+        )
+        self.assertTrue(MedicalHistory.objects.filter(patient=p, condition__iexact="Influenza").exists())
+
+    def test_diagnosis_deduped_case_insensitively(self):
+        from api.models import ActiveMedication, MedicalHistory
+        p = self._patient("D123457(7)")
+        ActiveMedication.objects.create(
+            patient=p, name="Dextromethorphan", dosage="450 mg/day",
+            route="oral", frequency="four times daily", start_date=date(2026, 9, 15),
+            diagnostic_result="Influenza",
+        )
+        ActiveMedication.objects.create(
+            patient=p, name="Paracetamol", dosage="500 mg",
+            route="oral", frequency="twice daily", start_date=date(2026, 9, 15),
+            diagnostic_result="influenza",
+        )
+        self.assertEqual(MedicalHistory.objects.filter(patient=p).count(), 1)
+
+    def test_empty_diagnosis_creates_no_row(self):
+        from api.models import ActiveMedication, MedicalHistory
+        p = self._patient("D123458(7)")
+        ActiveMedication.objects.create(
+            patient=p, name="Paracetamol", dosage="500 mg",
+            route="oral", frequency="twice daily", start_date=date(2026, 9, 15),
+        )
+        self.assertEqual(MedicalHistory.objects.filter(patient=p).count(), 0)

@@ -366,7 +366,7 @@ export function DifyChat({ appCode }: DifyChatProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={4}
-            placeholder="The textarea HTML element supports multi-line plain-text editing."
+            placeholder="Ask about the clinic, the patients, and other related matters."
             disabled={loading || !!error}
           />
           <Button onClick={sendMessage} disabled={loading || !input.trim()}>

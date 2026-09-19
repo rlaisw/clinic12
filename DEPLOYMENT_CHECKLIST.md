@@ -130,6 +130,11 @@ One public listener (`https://vps.tailb5775.ts.net/` = Tailscale funnel → Next
 - [ ] Test chatbot responses for patient queries (direct API via `/dify/api/chat-messages`)
 - [ ] Verify authentication (Dify webapp passport + Django token) is valid
 - [ ] Long queries may take > 3 min (LLM table re-formatting) — proxy timeout is 420 s
+- [ ] Confirm `api_medication_history` view exists: `backend/venv/bin/python manage.py shell -c "from django.db import connection; c=connection.cursor(); c.execute(\"SELECT name FROM sqlite_master WHERE type='view'\"); print(c.fetchall())"` (applied by migration `api.0019_medication_history_view`)
+- [ ] Confirm `/api/sql/` tolerates malformed SQL (trailing prose without `;`) instead of returning `syntax error`
+- [ ] Confirm a medication-history question ("what medications did X take in the last 6 months") returns entries from active + past + prescription tables
+- [ ] Confirm a diagnosis recorded via certificate/receipt/prescription auto-creates an `api_medicalhistory` row (signal `record_diagnosis`)
+- [ ] After editing the Dify workflow prompt, re-import `rag/dify_workflow.yml`/`.json` into Dify Studio and republish — repo files alone do not update the live bot
 
 ### Document Generation
 - [ ] Test receipt PDF generation with fillable fields
