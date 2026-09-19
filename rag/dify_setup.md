@@ -140,7 +140,7 @@ use the `/api/sql/` endpoint instead (it needs no embedding model).
 
 ## Step 4: Test
 
-Open `https://vps.tailb5775.ts.net/chat/45322G8rzGMEW7WP` and ask questions like:
+Open `https://vps.tailb5775.ts.net/chat/z0RCp1YQHYqySPZF` and ask questions like:
 - "How many patients?" → bot generates `SELECT COUNT(*) FROM api_patient;` → 30
 - "Tell me what medications Raymond Lai took in the last 6 months" → bot queries `api_medication_history` joined with `api_patient` and returns the complete active + past + prescription list
 - "Show me the medical history of Raymond Lai" → bot queries `api_medicalhistory` (auto-populated from diagnoses)

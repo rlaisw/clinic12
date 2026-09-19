@@ -58,9 +58,9 @@ Query (RAG API):
 - No new SQLite database
 - LanceDB is file-based (embedded), no external DB server needed
 - `all-MiniLM-L6-v2` for text embeddings (384-dim)
-- Dify server at `https://vps.tailb5775.ts.net`, app ID `45322G8rzGMEW7WP`
+- Dify server at `https://vps.tailb5775.ts.net`, app ID `z0RCp1YQHYqySPZF`
 
 ## Integration Points
-- Dify chatbot at `https://vps.tailb5775.ts.net/chat/45322G8rzGMEW7WP`
+- Dify chatbot at `https://vps.tailb5775.ts.net/chat/z0RCp1YQHYqySPZF`
 - RAG API at `https://vps.tailb5775.ts.net:8000`
 - Existing clinic SQLite at `backend/db.sqlite3`

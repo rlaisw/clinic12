@@ -193,7 +193,7 @@ export default function DoctorPatientLayout({
 
       {currentTab === "ai-chatbot" && (
         <div className="mt-4">
-          <DifyChat appCode="45322G8rzGMEW7WP" />
+          <DifyChat appCode="z0RCp1YQHYqySPZF" />
         </div>
       )}
     </div>

@@ -34,7 +34,7 @@ Single public listener — the Tailscale funnel terminates on the Next.js origin
 - **codebase-memory**: graph index (nodes/edges), auto-refresh on change. Tools: `search_graph`, `trace_path`, `get_architecture`.
 
 ### 🧩 AI Chatbot Integration (Dify)
-- **In-app tab**: `/doctor/patients/{id}/ai-chatbot` renders `<DifyChat appCode="45322G8rzGMEW7WP" />` (`apps/web/components/doctor/dify-chat.tsx`) — a **direct-API** client that claims a webapp passport from `/dify/api/passport` then POSTs to `/dify/api/chat-messages` (streaming/blocking supported). Not an iframe.
+- **In-app tab**: `/doctor/patients/{id}/ai-chatbot` renders `<DifyChat appCode="z0RCp1YQHYqySPZF" />` (`apps/web/components/doctor/dify-chat.tsx`) — a **direct-API** client that claims a webapp passport from `/dify/api/passport` then POSTs to `/dify/api/chat-messages` (streaming/blocking supported). Not an iframe.
 - **Dify's own web UI** is still reachable at `https://vps.tailb5775.ts.net/dify/` and the hosted chat at `https://vps.tailb5775.ts.net/chat/{app-id}` via the proxy.
 - **Auth**: Django Token Authentication (`Authorization: Token <token>`)
 - **RAG**: Dify HTTP node → `https://vps.tailb5775.ts.net:8000/api/rag/query` via SSRF proxy; LanceDB stores the embeddings.

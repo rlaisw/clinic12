@@ -3,7 +3,7 @@
 ## Prerequisites
 - Python 3.12 with venv (`backend/venv/`) — needs `sentence-transformers` (in `backend/requirements.txt`)
 - Existing clinic SQLite at `backend/db.sqlite3`
-- Dify chatbot accessible at `https://vps.tailb5775.ts.net/chat/45322G8rzGMEW7WP`
+- Dify chatbot accessible at `https://vps.tailb5775.ts.net/chat/z0RCp1YQHYqySPZF`
 
 > **Note**: the standalone FastAPI RAG server (`rag/rag_api.py`, old port 8001) is **retired**.
 > RAG + SQL now live in the Django backend (`:8000`): `/api/rag/query` and `/api/sql/`, both

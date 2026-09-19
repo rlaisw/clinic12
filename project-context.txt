@@ -81,7 +81,7 @@ apps/web/next.config.ts:
 ### DIFY & RAG CONFIGURATION ###
 **✅ WORKING**
 - Dify web UI: https://vps.tailb5775.ts.net/dify/ (via server.js proxy, :3001)
-- Hosted chat: https://vps.tailb5775.ts.net/chat/45322G8rzGMEW7WP (via proxy)
+- Hosted chat: https://vps.tailb5775.ts.net/chat/z0RCp1YQHYqySPZF (via proxy)
 - In-app AI chatbot: /doctor/patients/{id}/ai-chatbot -> DifyChat (direct API /dify/api/chat-messages, passport from /dify/api/passport)
 - RAG API: https://vps.tailb5775.ts.net:8000/api/rag/query (token-protected)
 - Vector store: LanceDB (backend/lancedb/), populated by rag/cocoindex_pipeline.py

@@ -23,7 +23,7 @@ Add a new "AI Chatbot" tab to the doctor's patient dashboard that opens the Dify
 - The tab must visually indicate when it is active (selected state styling matching other tabs)
 
 ### FR3: Chatbot Component (implemented as direct API)
-- The AI Chatbot page renders `<DifyChat appCode="45322G8rzGMEW7WP" />` in the content area
+- The AI Chatbot page renders `<DifyChat appCode="z0RCp1YQHYqySPZF" />` in the content area
 - Client obtains the webapp passport once via `POST /dify/api/passport` (header `X-App-Code`)
 - Messages are sent with `POST /dify/api/chat-messages` (JSON body: `inputs`, `query`, `response_mode: "blocking"`, `conversation_id`; headers `X-App-Code` + `X-App-Passport`)
 - The input is a 4-row textarea; **Enter** sends, **Shift+Enter** inserts a newline
@@ -58,7 +58,7 @@ Add a new "AI Chatbot" tab to the doctor's patient dashboard that opens the Dify
 6. Enter sends the message; Shift+Enter inserts a new line
 
 ## Assumptions
-- The Dify app code (`45322G8rzGMEW7WP`) is valid and the workflow is published
+- The Dify app code (`z0RCp1YQHYqySPZF`) is valid and the workflow is published
 - The frontend proxy (`server.js`) routes `/dify/api/*` to the Dify backend at `10.0.1.75:80`
 - The same role-based access pattern applies (DoctorPermission)
 
